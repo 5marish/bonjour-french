@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bonjour French 🇫🇷</title>
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f7f5f0;
+  color: #26334a;
+}
+header {
+  background: #244b78;
+  color: white;
+  text-align: center;
+  padding: 30px 15px;
+  border-radius: 0 0 25px 25px;
+}
+h1 { margin: 0; }
+main { padding: 20px; max-width: 600px; margin: auto; }
+.card {
+  background: white;
+  padding: 18px;
+  margin: 14px 0;
+  border-radius: 16px;
+  box-shadow: 0 3px 12px #00000010;
+}
+button, select {
+  padding: 12px;
+  border: 0;
+  border-radius: 10px;
+  background: #244b78;
+  color: white;
+  font-size: 16px;
+  margin: 5px 0;
+  cursor: pointer;
+}
+button { width: 100%; }
+.word { font-size: 24px; color: #244b78; font-weight: bold; }
+.small { color: #667085; }
+#result { font-weight: bold; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Bonjour French 🇫🇷</h1>
+  <p>Learn French every day!</p>
+  <select id="language" onchange="changeLanguage()">
+    <option value="en">English</option>
+    <option value="uz">O‘zbekcha</option>
+  </select>
+</header>
+
+<main>
+  <div class="card">
+    <h2 id="welcome">Welcome! 👋</h2>
+    <p id="intro">Learn French step by step.</p>
+  </div>
+
+  <div class="card">
+    <h2 id="lessonTitle">📚 First lesson: Greetings</h2>
+    <p class="word">Bonjour</p>
+    <p id="meaning">Hello / Good morning</p>
+    <p class="small">Pronunciation: bon-zhoor</p>
+    <button onclick="speak('Bonjour')">🔊 Listen</button>
+  </div>
+
+  <div class="card">
+    <h2 id="wordsTitle">🔤 Vocabulary</h2>
+    <p><b>Merci</b> — <span id="merci">Thank you</span></p>
+    <button onclick="speak('Merci')">🔊 Merci</button>
+    <p><b>Au revoir</b> — <span id="bye">Goodbye</span></p>
+    <button onclick="speak('Au revoir')">🔊 Au revoir</button>
+    <p><b>S'il vous plaît</b> — <span id="please">Please</span></p>
+    <button onclick="speak('S il vous plaît')">🔊 Please</button>
+  </div>
+
+  <div class="card">
+    <h2 id="quizTitle">🧠 Quick quiz</h2>
+    <p id="question">What does Bonjour mean?</p>
+    <button onclick="answer(false)">Goodbye</button>
+    <button onclick="answer(true)">Hello</button>
+    <p id="result"></p>
+  </div>
+
+  <div class="card">
+    <h2 id="daily">🏆 Daily practice</h2>
+    <p id="practice">Learn three new French words today!</p>
+  </div>
+</main>
+
+<script>
+const translations = {
+  en: {
+    welcome:"Welcome! 👋",
+    intro:"Learn French step by step.",
+    lessonTitle:"📚 First lesson: Greetings",
+    meaning:"Hello / Good morning",
+    wordsTitle:"🔤 Vocabulary",
+    merci:"Thank you",
+    bye:"Goodbye",
+    please:"Please",
+    quizTitle:"🧠 Quick quiz",
+    question:"What does Bonjour mean?",
+    daily:"🏆 Daily practice",
+    practice:"Learn three new French words today!",
+    correct:"Correct! 🎉",
+    wrong:"Try again! 😊"
+  },
+  uz: {
+    welcome:"Xush kelibsiz! 👋",
+    intro:"Fransuz tilini bosqichma-bosqich o‘rganing.",
+    lessonTitle:"📚 Birinchi dars: Salomlashish",
+    meaning:"Salom / Xayrli tong",
+    wordsTitle:"🔤 Lug‘at",
+    merci:"Rahmat",
+    bye:"Xayr",
+    please:"Iltimos",
+    quizTitle:"🧠 Tezkor test",
+    question:"Bonjour nimani anglatadi?",
+    daily:"🏆 Kundalik mashq",
+    practice:"Bugun uchta yangi fransuzcha so‘z o‘rganing!",
+    correct:"To‘g‘ri! 🎉",
+    wrong:"Yana urinib ko‘ring! 😊"
+  }
+};
+
+function changeLanguage() {
+  const lang = document.getElementById("language").value;
+  const t = translations[lang];
+  Object.keys(t).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = t[id];
+  });
+  document.getElementById("result").textContent = "";
+}
+
+function answer(correct) {
+  const lang = document.getElementById("language").value;
+  document.getElementById("result").textContent =
+    correct ? translations[lang].correct : translations[lang].wrong;
+}
+
+function speak(word) {
+  const speech = new SpeechSynthesisUtterance(word);
+  speech.lang = "fr-FR";
+  speech.rate = 0.85;
+  speechSynthesis.speak(speech);
+}
+</script>
+
+</body>
+</html>
