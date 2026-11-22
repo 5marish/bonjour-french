@@ -3,155 +3,248 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bonjour French 🇫🇷</title>
 <style>
+:root {
+  --green:#a8d8b5;
+  --dark:#285b3c;
+  --pale:#eff8f0;
+  --white:#ffffff;
+}
+* {box-sizing:border-box}
 body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f7f5f0;
-  color: #26334a;
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:var(--pale);
+  color:#294735;
 }
 header {
-  background: #244b78;
-  color: white;
-  text-align: center;
-  padding: 30px 15px;
-  border-radius: 0 0 25px 25px;
+  background:var(--green);
+  padding:27px 18px;
+  text-align:center;
+  border-radius:0 0 25px 25px;
 }
-h1 { margin: 0; }
-main { padding: 20px; max-width: 600px; margin: auto; }
+header h1 {margin:0;color:var(--dark)}
+header p {margin-bottom:0}
+main {padding:16px;max-width:700px;margin:auto}
+select,button {
+  padding:12px;
+  border-radius:12px;
+  border:1px solid #c5dfca;
+  font-size:15px;
+}
+select {background:white;color:var(--dark)}
 .card {
-  background: white;
-  padding: 18px;
-  margin: 14px 0;
-  border-radius: 16px;
-  box-shadow: 0 3px 12px #00000010;
+  background:white;
+  padding:17px;
+  border-radius:17px;
+  margin:14px 0;
+  box-shadow:0 2px 9px #285b3c12;
 }
-button, select {
-  padding: 12px;
-  border: 0;
-  border-radius: 10px;
-  background: #244b78;
-  color: white;
-  font-size: 16px;
-  margin: 5px 0;
-  cursor: pointer;
+h2 {color:var(--dark);font-size:19px}
+button {
+  background:var(--green);
+  color:var(--dark);
+  border:0;
+  font-weight:bold;
+  margin:4px;
+  cursor:pointer;
 }
-button { width: 100%; }
-.word { font-size: 24px; color: #244b78; font-weight: bold; }
-.small { color: #667085; }
-#result { font-weight: bold; }
+button:hover {background:#91cba0}
+table {
+  width:100%;
+  border-collapse:collapse;
+  text-align:left;
+}
+td,th {
+  padding:10px 6px;
+  border-bottom:1px solid #e2eee4;
+}
+th {color:var(--dark)}
+.example {
+  background:var(--pale);
+  padding:12px;
+  border-radius:12px;
+  margin:8px 0;
+}
+#answer {font-weight:bold;margin-top:12px}
+footer {text-align:center;padding:25px;color:#66836d}
 </style>
 </head>
 <body>
-
 <header>
   <h1>Bonjour French 🇫🇷</h1>
-  <p>Learn French every day!</p>
-  <select id="language" onchange="changeLanguage()">
-    <option value="en">English</option>
-    <option value="uz">O‘zbekcha</option>
+  <p>Learn • Conjugate • Practice</p>
+  <br>
+  <select id="language" onchange="render()">
+    <option value="en">🇬🇧 English</option>
+    <option value="uz">🇺🇿 O‘zbekcha</option>
   </select>
 </header>
 
 <main>
-  <div class="card">
-    <h2 id="welcome">Welcome! 👋</h2>
-    <p id="intro">Learn French step by step.</p>
-  </div>
+<section class="card">
+  <h2 id="welcome"></h2>
+  <p id="intro"></p>
+</section>
 
-  <div class="card">
-    <h2 id="lessonTitle">📚 First lesson: Greetings</h2>
-    <p class="word">Bonjour</p>
-    <p id="meaning">Hello / Good morning</p>
-    <p class="small">Pronunciation: bon-zhoor</p>
-    <button onclick="speak('Bonjour')">🔊 Listen</button>
-  </div>
+<section class="card">
+  <h2 id="verbTitle"></h2>
+  <select id="verb" onchange="showVerb()">
+    <option value="etre">ÊTRE — to be</option>
+    <option value="avoir">AVOIR — to have</option>
+    <option value="aller">ALLER — to go</option>
+    <option value="faire">FAIRE — to do/make</option>
+    <option value="parler">PARLER — to speak</option>
+    <option value="finir">FINIR — to finish</option>
+    <option value="prendre">PRENDRE — to take</option>
+    <option value="venir">VENIR — to come</option>
+  </select>
+  <h3 id="verbName"></h3>
+  <table>
+    <thead><tr><th>Person</th><th>Présent</th></tr></thead>
+    <tbody id="conjugation"></tbody>
+  </table>
+  <p id="verbExplanation"></p>
+  <button onclick="speakVerb()">🔊 Listen</button>
+</section>
 
-  <div class="card">
-    <h2 id="wordsTitle">🔤 Vocabulary</h2>
-    <p><b>Merci</b> — <span id="merci">Thank you</span></p>
-    <button onclick="speak('Merci')">🔊 Merci</button>
-    <p><b>Au revoir</b> — <span id="bye">Goodbye</span></p>
-    <button onclick="speak('Au revoir')">🔊 Au revoir</button>
-    <p><b>S'il vous plaît</b> — <span id="please">Please</span></p>
-    <button onclick="speak('S il vous plaît')">🔊 Please</button>
+<section class="card">
+  <h2 id="grammarTitle"></h2>
+  <h3>Le présent — Present tense</h3>
+  <p id="grammarText"></p>
+  <div class="example">
+    <b>Je parle français.</b>
+    <p id="translation"></p>
   </div>
+</section>
 
-  <div class="card">
-    <h2 id="quizTitle">🧠 Quick quiz</h2>
-    <p id="question">What does Bonjour mean?</p>
-    <button onclick="answer(false)">Goodbye</button>
-    <button onclick="answer(true)">Hello</button>
-    <p id="result"></p>
-  </div>
-
-  <div class="card">
-    <h2 id="daily">🏆 Daily practice</h2>
-    <p id="practice">Learn three new French words today!</p>
-  </div>
+<section class="card">
+  <h2 id="quizTitle"></h2>
+  <p id="question"></p>
+  <div id="answers"></div>
+  <p id="answer"></p>
+</section>
 </main>
 
+<footer>Made with 💚 for French learners 🇫🇷</footer>
+
 <script>
-const translations = {
-  en: {
-    welcome:"Welcome! 👋",
-    intro:"Learn French step by step.",
-    lessonTitle:"📚 First lesson: Greetings",
-    meaning:"Hello / Good morning",
-    wordsTitle:"🔤 Vocabulary",
-    merci:"Thank you",
-    bye:"Goodbye",
-    please:"Please",
-    quizTitle:"🧠 Quick quiz",
-    question:"What does Bonjour mean?",
-    daily:"🏆 Daily practice",
-    practice:"Learn three new French words today!",
-    correct:"Correct! 🎉",
-    wrong:"Try again! 😊"
-  },
-  uz: {
-    welcome:"Xush kelibsiz! 👋",
-    intro:"Fransuz tilini bosqichma-bosqich o‘rganing.",
-    lessonTitle:"📚 Birinchi dars: Salomlashish",
-    meaning:"Salom / Xayrli tong",
-    wordsTitle:"🔤 Lug‘at",
-    merci:"Rahmat",
-    bye:"Xayr",
-    please:"Iltimos",
-    quizTitle:"🧠 Tezkor test",
-    question:"Bonjour nimani anglatadi?",
-    daily:"🏆 Kundalik mashq",
-    practice:"Bugun uchta yangi fransuzcha so‘z o‘rganing!",
-    correct:"To‘g‘ri! 🎉",
-    wrong:"Yana urinib ko‘ring! 😊"
-  }
+const data = {
+etre:{
+name:"Être — to be",
+rows:["suis","es","est","sommes","êtes","sont"],
+en:"Être is an irregular verb. Learn its forms by heart.",
+uz:"Être — noto‘g‘ri fe’l. Uning shakllarini yodlab oling."
+},
+avoir:{
+name:"Avoir — to have",
+rows:["ai","as","a","avons","avez","ont"],
+en:"Avoir means to have. It is also used to form the passé composé.",
+uz:"Avoir — ega bo‘lmoq. Passé composé zamonini tuzishda ham ishlatiladi."
+},
+aller:{
+name:"Aller — to go",
+rows:["vais","vas","va","allons","allez","vont"],
+en:"Aller is irregular. It is also used to form the futur proche.",
+uz:"Aller — bormoq. Futur proche zamonini tuzishda ham ishlatiladi."
+},
+faire:{
+name:"Faire — to do / make",
+rows:["fais","fais","fait","faisons","faites","font"],
+en:"Faire is used for activities, actions and weather expressions.",
+uz:"Faire faoliyatlar, harakatlar va ob-havo haqida gapirganda ishlatiladi."
+},
+parler:{
+name:"Parler — to speak",
+rows:["parle","parles","parle","parlons","parlez","parlent"],
+en:"Parler is a regular -ER verb. Remove -er and add the present endings.",
+uz:"Parler muntazam -ER fe’li. -er ni olib tashlab, hozirgi zamon qo‘shimchalarini qo‘shing."
+},
+finir:{
+name:"Finir — to finish",
+rows:["finis","finis","finit","finissons","finissez","finissent"],
+en:"Finir is a regular -IR verb. Notice the -iss- in nous, vous and ils forms.",
+uz:"Finir muntazam -IR fe’li. Nous, vous va ils shakllarida -iss- ga e’tibor bering."
+},
+prendre:{
+name:"Prendre — to take",
+rows:["prends","prends","prend","prenons","prenez","prennent"],
+en:"Prendre is an irregular verb. Its spelling changes in plural forms.",
+uz:"Prendre — noto‘g‘ri fe’l. Ko‘plik shakllarida yozilishi o‘zgaradi."
+},
+venir:{
+name:"Venir — to come",
+rows:["viens","viens","vient","venons","venez","viennent"],
+en:"Venir is irregular. Remember the different singular and plural stems.",
+uz:"Venir — noto‘g‘ri fe’l. Birlik va ko‘plik shakllaridagi o‘zgarishlarni yodlang."
+}
 };
 
-function changeLanguage() {
-  const lang = document.getElementById("language").value;
-  const t = translations[lang];
-  Object.keys(t).forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = t[id];
-  });
-  document.getElementById("result").textContent = "";
-}
+const people = ["Je","Tu","Il / Elle / On","Nous","Vous","Ils / Elles"];
 
-function answer(correct) {
-  const lang = document.getElementById("language").value;
-  document.getElementById("result").textContent =
-    correct ? translations[lang].correct : translations[lang].wrong;
+function showVerb(){
+ const key=document.getElementById("verb").value;
+ const v=data[key];
+ document.getElementById("verbName").textContent=v.name;
+ document.getElementById("conjugation").innerHTML=
+ people.map((p,i)=>`<tr><td>${p}</td><td><b>${p} ${v.rows[i]}</b></td></tr>`).join("");
+ const lang=document.getElementById("language").value;
+ document.getElementById("verbExplanation").textContent=v[lang];
 }
-
-function speak(word) {
-  const speech = new SpeechSynthesisUtterance(word);
-  speech.lang = "fr-FR";
-  speech.rate = 0.85;
-  speechSynthesis.speak(speech);
+function speakVerb(){
+ const key=document.getElementById("verb").value;
+ const v=data[key];
+ const text=v.name+". "+v.rows.join(", ");
+ const speech=new SpeechSynthesisUtterance(text);
+ speech.lang="fr-FR";
+ speechSynthesis.speak(speech);
 }
+const words={
+en:{
+welcome:"Welcome to your French grammar school! 💚",
+intro:"Learn French verbs, understand grammar and practice every day.",
+verbTitle:"📚 Verb conjugation",
+grammarTitle:"📖 Grammar explanation",
+grammarText:"The present tense describes what happens now or regularly. For regular -ER verbs, remove -ER and add: e, es, e, ons, ez, ent.",
+translation:"I speak French.",
+quizTitle:"✏️ Quick quiz",
+question:"Choose the correct form: Je ___ français.",
+correct:"Correct! Très bien! 🎉",
+wrong:"Not quite. The correct answer is parle."
+},
+uz:{
+welcome:"Fransuz tili grammatikasiga xush kelibsiz! 💚",
+intro:"Fransuz fe’llarini o‘rganing, grammatikani tushuning va mashq qiling.",
+verbTitle:"📚 Fe’llar tuslanishi",
+grammarTitle:"📖 Grammatika tushuntirishi",
+grammarText:"Hozirgi zamon hozir yoki odatda sodir bo‘ladigan ishlarni ifodalaydi. Muntazam -ER fe’llarida -ER olib tashlanib, e, es, e, ons, ez, ent qo‘shiladi.",
+translation:"Men fransuz tilida gapiraman.",
+quizTitle:"✏️ Kichik test",
+question:"To‘g‘ri shaklni tanlang: Je ___ français.",
+correct:"To‘g‘ri! Très bien! 🎉",
+wrong:"Xato. To‘g‘ri javob: parle."
+}
+};
+function render(){
+ const lang=document.getElementById("language").value;
+ const d=words[lang];
+ ["welcome","intro","verbTitle","grammarTitle","grammarText","translation","quizTitle","question"].forEach(k=>{
+ document.getElementById(k).textContent=d[k];
+ });
+ document.getElementById("answers").innerHTML=
+ ["parle","parles","parlons"].map(x=>
+ `<button onclick="check('${x}')">${x}</button>`).join("");
+ document.getElementById("answer").textContent="";
+ showVerb();
+}
+function check(value){
+ const lang=document.getElementById("language").value;
+ document.getElementById("answer").textContent=
+ value==="parle"?words[lang].correct:words[lang].wrong;
+}
+render();
 </script>
-
 </body>
 </html>
