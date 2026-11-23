@@ -1,1 +1,231 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bonjour French 🇫🇷</title>
+<style>
+:root{--green:#dff2e5;--dark:#286b48;--white:#fff;--bg:#f7fbf8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:#26382d;font-family:Arial,sans-serif}
+header{background:white;padding:22px 16px;text-align:center;border-bottom:1px solid #e5eee7}
+h1{margin:0;color:var(--dark);font-size:25px}
+header p{margin:7px 0 0;color:#718477;font-size:14px}
+main{max-width:650px;margin:18px auto;padding:0 14px 35px}
+section{background:white;border:1px solid #e3eee6;border-radius:16px;padding:17px;margin-bottom:15px}
+h2{font-size:18px;color:var(--dark);margin:0 0 14px}
+label{display:block;font-size:14px;font-weight:bold;margin:12px 0 6px}
+input,select{width:100%;padding:13px;border:1px solid #d6e5da;border-radius:10px;background:white;font-size:16px;color:#26382d}
+button{border:0;border-radius:10px;padding:13px 17px;background:var(--dark);color:white;font-size:15px;font-weight:bold;cursor:pointer}
+button.secondary{background:var(--green);color:var(--dark)}
+.actions{display:flex;gap:9px;margin-top:12px}
+.actions button{flex:1}
+.person{display:flex;align-items:center;gap:10px;margin:9px 0}
+.person span{width:105px;font-size:14px}
+.person strong{flex:1;font-weight:600}
+.answer{width:100%;padding:10px}
+.result{margin-top:13px;padding:12px;border-radius:10px;background:#f0f7f2;font-size:14px}
+.good{color:#187343}.bad{color:#b33b3b}
+.hidden{display:none}
+small{color:#718477}
+#status{font-size:13px;color:#718477;margin-top:10px}
+@media(max-width:380px){.person span{width:85px;font-size:13px}.person{gap:6px}}
+</style>
+</head>
+<body>
+<header>
+<h1>Bonjour French 🇫🇷</h1>
+<p id="subtitle">Learn and practise French verbs</p>
+</header>
+<main>
+<section>
+<label id="languageLabel" for="language">App language</label>
+<select id="language">
+<option value="en">English</option>
+<option value="uz">O‘zbekcha</option>
+<option value="ru">Русский</option>
+</select>
+</section>
+
+<section>
+<h2 id="findTitle">Find a French verb</h2>
+<label id="searchLabel" for="search">Search verb</label>
+<input id="search" list="verbs" placeholder="Example: être">
+<datalist id="verbs"></datalist>
+<div class="actions">
+<button id="findButton">Find verb</button>
+<button class="secondary" id="randomButton">Random</button>
+</div>
+<label id="tenseLabel" for="tense">Choose tense</label>
+<select id="tense">
+<option value="present">Présent</option>
+<option value="passeCompose">Passé composé</option>
+<option value="imparfait">Imparfait</option>
+<option value="plusQueParfait">Plus-que-parfait</option>
+<option value="futur">Futur simple</option>
+<option value="conditionnel">Conditionnel présent</option>
+</select>
+<div id="conjugation" class="result">Choose a verb and press Find verb.</div>
+<div id="status"></div>
+</section>
+
+<section>
+<h2 id="quizTitle">Written conjugation quiz</h2>
+<label id="quizVerbLabel" for="quizVerb">Choose a verb</label>
+<select id="quizVerb"></select>
+<label id="quizTenseLabel" for="quizTense">Choose tense</label>
+<select id="quizTense">
+<option value="present">Présent</option>
+<option value="passeCompose">Passé composé</option>
+<option value="imparfait">Imparfait</option>
+<option value="plusQueParfait">Plus-que-parfait</option>
+<option value="futur">Futur simple</option>
+<option value="conditionnel">Conditionnel présent</option>
+</select>
+<div class="actions">
+<button id="startQuiz">Start quiz</button>
+</div>
+<div id="quizArea" class="hidden">
+<div id="quizInputs"></div>
+<button id="checkButton" style="width:100%;margin-top:12px">Check all answers</button>
+<div id="quizResult" class="result hidden"></div>
+</div>
+</section>
+</main>
+<script>
+const verbs = [
+"être","avoir","aller","faire","dire","pouvoir","vouloir","savoir","voir","venir",
+"devoir","prendre","mettre","donner","parler","aimer","passer","penser","croire","demander",
+"trouver","rendre","comprendre","rester","tenir","porter","entrer","sortir","partir","arriver",
+"vivre","suivre","connaître","paraître","sentir","attendre","entendre","répondre","perdre","recevoir",
+"écrire","lire","ouvrir","offrir","découvrir","courir","mourir","naître","boire","conduire",
+"produire","traduire","construire","détruire","apprendre","reprendre","surprendre","permettre","promettre","admettre",
+"envoyer","payer","essayer","nettoyer","employer","appeler","jeter","acheter","préférer","espérer",
+"lever","mener","amener","emmener","créer","étudier","travailler","jouer","marcher","chercher",
+"commencer","manger","changer","voyager","nager","placer","annoncer","lancer","avancer","effacer",
+"finir","choisir","réussir","grandir","remplir","réfléchir","obéir","punir","bâtir","vieillir",
+"agir","réagir","établir","fournir","guérir","rougir","applaudir","unir","saisir","investir",
+"vendre","permettre","descendre","défendre","attendre","répondre","entendre","perdre","rendre","tendre",
+"rompre","interrompre","correspondre","dépendre","craindre","joindre","peindre","atteindre","éteindre","plaindre",
+"valoir","falloir","pleuvoir","suffire","servir","dormir","mentir","sortir","sentir","ressentir",
+"fuir","cueillir","accueillir","recueillir","souffrir","couvrir","découvrir","conclure","exclure","inclure",
+"résoudre","absoudre","coudre","moudre","battre","combattre","abattre","vaincre","convaincre","vivre",
+"survivre","revivre","rire","sourire","plaire","déplaire","taire","se taire","s'asseoir","asseoir",
+"craquer","manquer","expliquer","présenter","proposer","accepter","refuser","permettre","empêcher","éviter",
+"oublier","rappeler","reconnaître","imaginer","décider","organiser","préparer","continuer","terminer","financer",
+"apparaître","disparaître","reconstruire","décrire","inscrire","décrire","transmettre","soumettre","combiner","comparer"
+];
+const uniqueVerbs=[...new Set(verbs)];
+const people=["je","tu","il","nous","vous","ils"];
+const labels=["Je","Tu","Il / Elle / On","Nous","Vous","Ils / Elles"];
+const tenses={
+present:{mode:"Indicatif",name:"Présent"},
+passeCompose:{mode:"Indicatif",name:"Passé composé"},
+imparfait:{mode:"Indicatif",name:"Imparfait"},
+plusQueParfait:{mode:"Indicatif",name:"Plus-que-parfait"},
+futur:{mode:"Indicatif",name:"Futur simple"},
+conditionnel:{mode:"Conditionnel",name:"Présent"}
+};
+const translations={
+en:{subtitle:"Learn and practise French verbs",language:"App language",find:"Find a French verb",search:"Search verb",findBtn:"Find verb",random:"Random",tense:"Choose tense",quiz:"Written conjugation quiz",chooseVerb:"Choose a verb",start:"Start quiz",check:"Check all answers",empty:"Choose a verb and press Find verb.",loading:"Loading conjugation…",error:"Could not load this verb. Check your internet connection or try another verb.",score:"Your score",correct:"Correct",incorrect:"Incorrect",missing:"Please fill in all six answers."},
+uz:{subtitle:"Fransuz fe'llarini o‘rganing va mashq qiling",language:"Ilova tili",find:"Fransuzcha fe'lni toping",search:"Fe'lni qidiring",findBtn:"Topish",random:"Tasodifiy",tense:"Zamonni tanlang",quiz:"Yozma tuslash testi",chooseVerb:"Fe'lni tanlang",start:"Testni boshlash",check:"Javoblarni tekshirish",empty:"Fe'lni tanlang va Topish tugmasini bosing.",loading:"Tuslanish yuklanmoqda…",error:"Fe'lni yuklab bo‘lmadi. Internetni tekshiring yoki boshqa fe'lni tanlang.",score:"Natijangiz",correct:"To‘g‘ri",incorrect:"Noto‘g‘ri",missing:"Iltimos, oltita javobni ham kiriting."},
+ru:{subtitle:"Изучайте и практикуйте французские глаголы",language:"Язык приложения",find:"Найти французский глагол",search:"Поиск глагола",findBtn:"Найти",random:"Случайный",tense:"Выберите время",quiz:"Письменный тест спряжения",chooseVerb:"Выберите глагол",start:"Начать тест",check:"Проверить ответы",empty:"Выберите глагол и нажмите «Найти».",loading:"Загрузка спряжения…",error:"Не удалось загрузить глагол. Проверьте интернет или выберите другой глагол.",score:"Ваш результат",correct:"Правильно",incorrect:"Неправильно",missing:"Пожалуйста, заполните все шесть ответов."}
+};
+let language="en", currentForms=null, quizForms=null;
+const $=id=>document.getElementById(id);
+function normalize(s){return String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[’']/g,"'").replace(/[.,!?]/g,"").replace(/\s+/g," ").trim()}
+function slug(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9-]/g,"-").replace(/-+/g,"-")}
+function setLanguage(){
+language=$("language").value;const t=translations[language];
+$("subtitle").textContent=t.subtitle;$("languageLabel").textContent=t.language;
+$("findTitle").textContent=t.find;$("searchLabel").textContent=t.search;
+$("findButton").textContent=t.findBtn;$("randomButton").textContent=t.random;
+$("tenseLabel").textContent=t.tense;$("quizTitle").textContent=t.quiz;
+$("quizVerbLabel").textContent=t.chooseVerb;$("quizTenseLabel").textContent=t.tense;
+$("startQuiz").textContent=t.start;$("checkButton").textContent=t.check;
+}
+function fillLists(){
+$("verbs").innerHTML=uniqueVerbs.map(v=>`<option value="${v}"></option>`).join("");
+$("quizVerb").innerHTML=uniqueVerbs.map(v=>`<option value="${v}">${v}</option>`).join("");
+}
+function findMode(data,modeName){
+const modes=data.modes||data.data?.modes||[];
+return modes.find(m=>normalize(m.mode||m.nom||m.name)===normalize(modeName));
+}
+function findTense(data,key){
+const mt=tenses[key];const mode=findMode(data,mt.mode);
+if(!mode)return null;
+const list=mode.temps||mode.tenses||[];
+return list.find(x=>normalize(x.nom||x.name||x.temps)===normalize(mt.name));
+}
+function extractForms(data,key){
+const tense=findTense(data,key);if(!tense)return null;
+const forms=tense.formes||tense.forms||[];
+const map={};
+for(const f of forms){
+const p=normalize(f.pronom||f.pronoun||"");
+const val=f.valeur||f.value||"";
+const txt=f.texte||f.text||"";
+if(p)map[p]={value:val,text:txt};
+}
+return people.map(p=>{
+let f=map[p];
+if(!f&&p==="il")f=map["elle"]||map["on"]||map["il/elle/on"];
+if(!f&&p==="ils")f=map["elles"]||map["ils/elles"];
+return f||null;
+});
+}
+const cache={};
+async function loadForms(verb,key){
+const cacheKey=verb+"|"+key;if(cache[cacheKey])return cache[cacheKey];
+const response=await fetch("https://conjugaison.app/"+slug(verb)+".json");
+if(!response.ok)throw new Error("HTTP "+response.status);
+const data=await response.json();
+const forms=extractForms(data,key);
+if(!forms||forms.some(x=>!x))throw new Error("Missing forms for "+key);
+cache[cacheKey]=forms;return forms;
+}
+function showConjugation(forms){
+$("conjugation").innerHTML=forms.map((f,i)=>`<div class="person"><span>${labels[i]}</span><strong>${f.text||f.value}</strong></div>`).join("");
+}
+async function findVerb(){
+const verb=$("search").value.trim();if(!verb)return;
+$("status").textContent=translations[language].loading;
+$("conjugation").textContent=translations[language].loading;
+try{currentForms=await loadForms(verb,$("tense").value);showConjugation(currentForms);$("status").textContent=verb;}
+catch(e){$("conjugation").textContent=translations[language].error;$("status").textContent="";}
+}
+$("findButton").onclick=findVerb;
+$("randomButton").onclick=()=>{$("search").value=uniqueVerbs[Math.floor(Math.random()*uniqueVerbs.length)];findVerb()};
+$("tense").onchange=()=>{if($("search").value.trim())findVerb()};
+$("language").onchange=setLanguage;
+$("startQuiz").onclick=async()=>{
+const verb=$("quizVerb").value,key=$("quizTense").value;
+$("quizArea").classList.remove("hidden");$("quizResult").classList.add("hidden");
+$("quizInputs").innerHTML=labels.map((p,i)=>`<label>${p}<input class="answer" id="answer${i}" autocomplete="off" placeholder="…"></label>`).join("");
+try{quizForms=await loadForms(verb,key);$("quizInputs").dataset.ready="yes";}
+catch(e){quizForms=null;$("quizInputs").dataset.ready="no";$("quizResult").textContent=translations[language].error;$("quizResult").classList.remove("hidden");}
+};
+function acceptable(input,form){
+const typed=normalize(input);
+const options=[normalize(form.value),normalize(form.text)];
+return options.some(x=>x===typed||x.replace(/^(je|j'|tu|il|elle|on|nous|vous|ils|elles)\s*/,"")===typed);
+}
+$("checkButton").onclick=()=>{
+if(!quizForms)return;
+const answers=labels.map((_,i)=>$("answer"+i).value.trim());
+if(answers.some(x=>!x)){alert(translations[language].missing);return;}
+let score=0;
+const rows=quizForms.map((f,i)=>{
+const ok=acceptable(answers[i],f);if(ok)score++;
+return `<div class="${ok?'good':'bad'}">${labels[i]}: ${ok?'✓ '+translations[language].correct:'✗ '+translations[language].incorrect} — <strong>${f.text||f.value}</strong></div>`;
+}).join("");
+$("quizResult").innerHTML=`<h3>${translations[language].score}: ${score}/6</h3>${rows}`;
+$("quizResult").classList.remove("hidden");
+};
+fillLists();setLanguage();
+</script>
+</body>
+</html>
+
