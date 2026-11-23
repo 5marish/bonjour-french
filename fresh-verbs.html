@@ -1,1 +1,236 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fresh Verbs 🌿</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f3faf4;color:#244333;font-family:Arial,sans-serif}
+header{background:#d9f0dc;text-align:center;padding:22px 12px}
+h1{margin:0;color:#247442;font-size:29px}
+header p{margin:7px 0 0}
+main{max-width:760px;margin:18px auto;padding:14px}
+.card{background:white;border:1px solid #dcecdf;border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:0 3px 12px #2443330b}
+label{display:block;font-weight:bold;margin:12px 0 6px}
+select,input{width:100%;padding:12px;border:1px solid #cbdccc;border-radius:9px;font-size:16px;background:white;color:#244333}
+button{background:#318451;color:white;border:0;padding:12px 18px;border-radius:9px;font-size:16px;font-weight:bold;cursor:pointer;margin-top:12px}
+button:hover{background:#246b40}
+.meaning{background:#eff8f0;padding:12px;border-radius:10px;margin-top:12px;line-height:1.7}
+.person{font-weight:bold;width:95px}
+.formrow{display:flex;gap:10px;align-items:center;margin:9px 0}
+.formrow input{flex:1;min-width:0}
+.correct{color:#21834a;font-weight:bold}
+.wrong{color:#c0392b;font-weight:bold}
+.answer{font-size:13px;color:#52705b;margin-top:4px}
+#result{font-weight:bold;margin-top:14px;line-height:1.7}
+small{color:#607968}
+</style>
+</head>
+<body>
+<header>
+<h1>🌿 Fresh Verbs</h1>
+<p>Learn French, one verb at a time! 🇫🇷</p>
+</header>
+<main>
+<section class="card">
+<label for="language">🌍 App language</label>
+<select id="language">
+<option value="en">English</option>
+<option value="uz">O‘zbekcha</option>
+<option value="ru">Русский</option>
+</select>
+<label for="search">🔎 Find a French verb</label>
+<input id="search" placeholder="Search: être, lire, apprendre...">
+<label for="verb">Choose a verb</label>
+<select id="verb"></select>
+<div class="meaning" id="meaning"></div>
+<label for="tense">Choose a tense</label>
+<select id="tense">
+<option value="present">Présent</option>
+<option value="passe">Passé composé</option>
+<option value="imparfait">Imparfait</option>
+<option value="plus">Plus-que-parfait</option>
+<option value="futur">Futur simple</option>
+<option value="conditionnel">Conditionnel présent</option>
+</select>
+<div id="conjugation"></div>
+</section>
+
+<section class="card">
+<h2>✍️ Conjugation Quiz</h2>
+<p>Write all six forms. Accents must be correct!</p>
+<label for="quizTense">Choose a tense</label>
+<select id="quizTense">
+<option value="present">Présent</option>
+<option value="passe">Passé composé</option>
+<option value="imparfait">Imparfait</option>
+<option value="plus">Plus-que-parfait</option>
+<option value="futur">Futur simple</option>
+<option value="conditionnel">Conditionnel présent</option>
+</select>
+<label for="quizVerb">Choose a verb</label>
+<select id="quizVerb"></select>
+<div id="quizFields"></div>
+<button onclick="checkQuiz()">Check answers</button>
+<div id="result" aria-live="polite"></div>
+</section>
+</main>
+
+<script>
+const people=["je","tu","il/elle/on","nous","vous","ils/elles"];
+const endings={
+er:["e","es","e","ons","ez","ent"],
+ir:["is","is","it","issons","issez","issent"],
+re:["s","s","","ons","ez","ent"]
+};
+
+/* Verb data: infinitive, English, Uzbek, Russian, class,
+   irregular present forms, past participle, future stem, auxiliary */
+const verbs=[
+["être","to be","bo‘lmoq","быть","er",["suis","es","est","sommes","êtes","sont"],"été","ser","avoir"],
+["avoir","to have","ega bo‘lmoq","иметь","er",["ai","as","a","avons","avez","ont"],"eu","aur","avoir"],
+["aller","to go","bormoq","идти","er",["vais","vas","va","allons","allez","vont"],"allé","ir","être"],
+["faire","to do / make","qilmoq","делать","re",["fais","fais","fait","faisons","faites","font"],"fait","fer","avoir"],
+["dire","to say","aytmoq","говорить","re",["dis","dis","dit","disons","dites","disent"],"dit","dir","avoir"],
+["lire","to read","o‘qimoq","читать","re",["lis","lis","lit","lisons","lisez","lisent"],"lu","lir","avoir"],
+["écrire","to write","yozmoq","писать","re",["écris","écris","écrit","écrivons","écrivez","écrivent"],"écrit","écrir","avoir"],
+["prendre","to take","olmoq","брать","re",["prends","prends","prend","prenons","prenez","prennent"],"pris","prendr","avoir"],
+["comprendre","to understand","tushunmoq","понимать","re",["comprends","comprends","comprend","comprenons","comprenez","comprennent"],"compris","comprendr","avoir"],
+["apprendre","to learn","o‘rganmoq","учить","re",["apprends","apprends","apprend","apprenons","apprenez","apprennent"],"appris","apprendr","avoir"],
+["mettre","to put","qo‘ymoq","класть","re",["mets","mets","met","mettons","mettez","mettent"],"mis","mettr","avoir"],
+["permettre","to allow","ruxsat bermoq","разрешать","re",["permets","permets","permet","permettons","permettez","permettent"],"permis","permettr","avoir"],
+["voir","to see","ko‘rmoq","видеть","re",["vois","vois","voit","voyons","voyez","voient"],"vu","verr","avoir"],
+["vouloir","to want","xohlamoq","хотеть","re",["veux","veux","veut","voulons","voulez","veulent"],"voulu","voudr","avoir"],
+["pouvoir","to be able to","qila olmoq","мочь","re",["peux","peux","peut","pouvons","pouvez","peuvent"],"pu","pourr","avoir"],
+["devoir","to have to","kerak bo‘lmoq","быть должным","re",["dois","dois","doit","devons","devez","doivent"],"dû","devr","avoir"],
+["savoir","to know","bilmoq","знать","re",["sais","sais","sait","savons","savez","savent"],"su","saur","avoir"],
+["venir","to come","kelmoq","приходить","re",["viens","viens","vient","venons","venez","viennent"],"venu","viendr","être"],
+["tenir","to hold","ushlamoq","держать","re",["tiens","tiens","tient","tenons","tenez","tiennent"],"tenu","tiendr","avoir"],
+["boire","to drink","ichmoq","пить","re",["bois","bois","boit","buvons","buvez","boivent"],"bu","boir","avoir"],
+["connaître","to know / be familiar with","tanish bo‘lmoq","знать","re",["connais","connais","connaît","connaissons","connaissez","connaissent"],"connu","connaîtr","avoir"],
+["recevoir","to receive","qabul qilmoq","получать","re",["reçois","reçois","reçoit","recevons","recevez","reçoivent"],"reçu","recevr","avoir"],
+["vivre","to live","yashamoq","жить","re",["vis","vis","vit","vivons","vivez","vivent"],"vécu","vivr","avoir"],
+["partir","to leave","jo‘namoq","уходить","ir",["pars","pars","part","partons","partez","partent"],"parti","partir","être"],
+["sortir","to go out","tashqariga chiqmoq","выходить","ir",["sors","sors","sort","sortons","sortez","sortent"],"sorti","sortir","avoir"],
+["dormir","to sleep","uxlamoq","спать","ir",["dors","dors","dort","dormons","dormez","dorment"],"dormi","dormir","avoir"],
+["finir","to finish","tugatmoq","заканчивать","ir",null,"fini","finir","avoir"],
+["choisir","to choose","tanlamoq","выбирать","ir",null,"choisi","choisir","avoir"],
+["réussir","to succeed","muvaffaqiyat qozonmoq","добиваться успеха","ir",null,"réussi","réussir","avoir"],
+["vendre","to sell","sotmoq","продавать","re",null,"vendu","vendr","avoir"],
+["attendre","to wait","kutmoq","ждать","re",null,"attendu","attendr","avoir"],
+["répondre","to answer","javob bermoq","отвечать","re",null,"répondu","répondr","avoir"],
+["perdre","to lose","yo‘qotmoq","терять","re",null,"perdu","perdr","avoir"],
+["parler","to speak","gapirmoq","говорить","er",null,"parlé","parler","avoir"],
+["aimer","to love / like","sevmoq","любить","er",null,"aimé","aimer","avoir"],
+["travailler","to work","ishlamoq","работать","er",null,"travaillé","travailler","avoir"],
+["étudier","to study","o‘qimoq","учиться","er",null,"étudié","étudier","avoir"],
+["chercher","to look for","qidirmoq","искать","er",null,"cherché","chercher","avoir"],
+["donner","to give","bermoq","давать","er",null,"donné","donner","avoir"],
+["arriver","to arrive","yetib kelmoq","прибывать","er",null,"arrivé","arriver","être"],
+["rester","to stay","qolmoq","оставаться","er",null,"resté","rester","être"],
+["entrer","to enter","kirmoq","входить","er",null,"entré","entrer","être"],
+["tomber","to fall","yiqilmoq","падать","er",null,"tombé","tomber","être"],
+["manger","to eat","yemoq","есть","er",["mange","manges","mange","mangeons","mangez","mangent"],"mangé","manger","avoir"],
+["acheter","to buy","sotib olmoq","покупать","er",["achète","achètes","achète","achetons","achetez","achètent"],"acheté","achèter","avoir"],
+["appeler","to call","qo‘ng‘iroq qilmoq","звать","er",["appelle","appelles","appelle","appelons","appelez","appellent"],"appelé","appeller","avoir"],
+["envoyer","to send","yubormoq","отправлять","er",["envoie","envoies","envoie","envoyons","envoyez","envoient"],"envoyé","enverr","avoir"],
+["ouvrir","to open","ochmoq","открывать","ir",["ouvre","ouvres","ouvre","ouvrons","ouvrez","ouvrent"],"ouvert","ouvrir","avoir"],
+["offrir","to offer","taklif qilmoq","предлагать","ir",["offre","offres","offre","offrons","offrez","offrent"],"offert","offrir","avoir"]
+];
+
+const auxPresent=["ai","as","a","avons","avez","ont"];
+const auxImperfect=["avais","avais","avait","avions","aviez","avaient"];
+const etrePresent=["suis","es","est","sommes","êtes","sont"];
+const etreImperfect=["étais","étais","était","étions","étiez","étaient"];
+const imperfectEnd=["ais","ais","ait","ions","iez","aient"];
+const futureEnd=["ai","as","a","ons","ez","ont"];
+const condEnd=["ais","ais","ait","ions","iez","aient"];
+
+function presentForms(v){
+ if(v[5]) return v[5];
+ const stem=v[0].slice(0,-2);
+ return endings[v[4]].map(e=>stem+e);
+}
+function imperfectForms(v){
+ if(v[0]==="être") return ["étais","étais","était","étions","étiez","étaient"];
+ const nous=presentForms(v)[3];
+ const stem=nous.slice(0,-3);
+ return imperfectEnd.map(e=>stem+e);
+}
+function futureForms(v){return futureEnd.map(e=>v[7]+e)}
+function compound(v,auxForms){
+ return auxForms.map((a,i)=>{
+   let pp=v[6];
+   if(v[8]==="être"){
+     if(i===2) pp+="e";
+     if(i===5) pp+="s";
+   }
+   return a+" "+pp;
+ });
+}
+function forms(v,t){
+ if(t==="present") return presentForms(v);
+ if(t==="imparfait") return imperfectForms(v);
+ if(t==="futur") return futureForms(v);
+ if(t==="conditionnel") return condEnd.map(e=>v[7]+e);
+ if(t==="passe") return compound(v,v[8]==="être"?etrePresent:auxPresent);
+ if(t==="plus") return compound(v,v[8]==="être"?etreImperfect:auxImperfect);
+}
+function selectedVerb(){return verbs.find(v=>v[0]===document.getElementById("verb").value)}
+function language(){return document.getElementById("language").value}
+function updateMeaning(){
+ const v=selectedVerb(), l=language();
+ const i={en:1,uz:2,ru:3}[l];
+ document.getElementById("meaning").innerHTML=
+ `<b>${v[0]}</b> — ${v[i]}<br><small>Infinitive meaning / Ma’nosi / Значение</small>`;
+}
+function updateConjugation(){
+ const v=selectedVerb(), t=document.getElementById("tense").value;
+ const f=forms(v,t);
+ document.getElementById("conjugation").innerHTML="<h3>Conjugation</h3>"+
+ f.map((x,i)=>`<div class="formrow"><span class="person">${people[i]}</span><b>${x}</b></div>`).join("");
+ updateMeaning();
+}
+function fillVerbs(){
+ const search=document.getElementById("search").value.toLowerCase();
+ const filtered=verbs.filter(v=>v[0].toLowerCase().includes(search));
+ const options=filtered.map(v=>`<option value="${v[0]}">${v[0]}</option>`).join("");
+ document.getElementById("verb").innerHTML=options;
+ document.getElementById("quizVerb").innerHTML=options;
+ updateConjugation();
+ makeQuiz();
+}
+function makeQuiz(){
+ const fields=document.getElementById("quizFields");
+ fields.innerHTML=people.map((p,i)=>`<label>${p}</label><input autocomplete="off" class="quizInput" data-index="${i}" placeholder="Write the correct form">`).join("");
+ document.getElementById("result").textContent="";
+}
+function normalize(s){
+ return s.trim().toLocaleLowerCase("fr").replace(/\s+/g," ");
+}
+function checkQuiz(){
+ const v=verbs.find(x=>x[0]===document.getElementById("quizVerb").value);
+ const t=document.getElementById("quizTense").value;
+ const expected=forms(v,t);
+ const inputs=[...document.querySelectorAll(".quizInput")];
+ let score=0;
+ let output="";
+ inputs.forEach((input,i)=>{
+   const ok=normalize(input.value)===normalize(expected[i]);
+   if(ok) score++;
+   output+=`<div class="${ok?"correct":"wrong"}">${people[i]}: ${ok?"✓ Correct":"✗ Incorrect"}${ok?"":`<div class="answer">Correct answer: ${expected[i]}</div>`}</div>`;
+ });
+ document.getElementById("result").innerHTML=`Your score: ${score}/6<br>${output}`;
+}
+document.getElementById("search").addEventListener("input",fillVerbs);
+document.getElementById("verb").addEventListener("change",updateConjugation);
+document.getElementById("tense").addEventListener("change",updateConjugation);
+document.getElementById("language").addEventListener("change",updateMeaning);
+document.getElementById("quizVerb").addEventListener("change",makeQuiz);
+fillVerbs();
+</script>
+</body>
+</html>
+
