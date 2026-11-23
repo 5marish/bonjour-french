@@ -1,1 +1,471 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bonjour French 🇫🇷</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:14px;background:#f1f9f3;color:#263b30;font-family:Arial,sans-serif}
+header,.panel{background:white;border-radius:16px;padding:18px;margin:12px auto;max-width:850px}
+header{text-align:center;background:#e4f3e8}
+h1,h2{color:#347b59}
+nav{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin:15px}
+button{background:#347b59;color:white;border:0;border-radius:9px;padding:12px;cursor:pointer}
+input,select{width:100%;padding:12px;border:1px solid #c7ddce;border-radius:9px;background:white;font-size:16px;margin:6px 0 12px}
+label{font-weight:bold}
+.hidden{display:none}
+table{width:100%;border-collapse:collapse;margin-top:15px}
+td,th{padding:10px;border-bottom:1px solid #dfebe2;text-align:left}
+th{background:#e4f3e8}
+.answer{color:#347b59;font-weight:bold}
+.small{font-size:13px;color:#64766a}
+#choices button{margin:5px}
+</style>
+</head>
+<body>
+<header>
+<h1>Bonjour French 🇫🇷</h1>
+<p>French Verb Conjugation Practice</p>
+<p>Learn • Conjugate • Practise</p>
+</header>
+
+<nav>
+<button onclick="page('conjugation')">Conjugation</button>
+<button onclick="page('grammar')">Grammar</button>
+<button onclick="page('quiz')">Quiz</button>
+</nav>
+
+<section id="conjugation" class="panel">
+<h2>Find a French verb</h2>
+<label>Search</label>
+<input id="search" placeholder="Type a French verb">
+<button onclick="findVerb()">Find</button>
+
+<label>Select a verb</label>
+<select id="verb"></select>
+<p id="translation"></p>
+
+<label>Select a tense</label>
+<select id="tense">
+<option value="present">Présent</option>
+<option value="passeCompose">Passé composé</option>
+<option value="imparfait">Imparfait</option>
+<option value="plusQueParfait">Plus-que-parfait</option>
+<option value="futur">Futur simple</option>
+<option value="conditionnel">Conditionnel présent</option>
+</select>
+<button onclick="loadVerb()">Show conjugation</button>
+<p id="status" class="small"></p>
+<div id="result"></div>
+</section>
+
+<section id="grammar" class="panel hidden">
+<h2>French Grammar</h2>
+<h3>1. Présent</h3>
+<p>Used for actions happening now, habits and general truths.</p>
+<p><b>Example:</b> Je travaille. — I work / I am working.</p>
+<h3>2. Passé composé</h3>
+<p>Used for completed past actions. Formed with the present tense of avoir or être and a past participle.</p>
+<p><b>Example:</b> J'ai fini. — I have finished.</p>
+<p>With être, the past participle normally agrees with the subject: Elle est arrivée. With avoir, it normally agrees with a preceding direct object: Les lettres que j'ai écrites.</p>
+<h3>3. Imparfait</h3>
+<p>Used for past habits, descriptions and ongoing situations in the past.</p>
+<p><b>Example:</b> Quand j'étais petite, je lisais beaucoup.</p>
+<h3>4. Plus-que-parfait</h3>
+<p>Used for an action completed before another past action. Formed with the imparfait of avoir or être and a past participle.</p>
+<p><b>Example:</b> J'avais déjà mangé.</p>
+<h3>5. Futur simple</h3>
+<p>Used for future actions and events.</p>
+<p><b>Example:</b> Demain, nous partirons.</p>
+<h3>6. Conditionnel présent</h3>
+<p>Used for polite requests, possibilities and hypothetical situations.</p>
+<p><b>Example:</b> Je voudrais un café.</p>
+<h3>Subject pronouns</h3>
+<p>Je = I · Tu = You · Il/Elle/On = He/She/One</p>
+<p>Nous = We · Vous = You · Ils/Elles = They</p>
+<h3>Important rules</h3>
+<ul>
+<li>French verbs agree with their subject.</li>
+<li>Compound tenses use an auxiliary verb: avoir or être.</li>
+<li>Past participle agreement depends on the auxiliary and sentence structure.</li>
+<li>Pronominal verbs generally use être in compound tenses.</li>
+</ul>
+</section>
+
+<section id="quiz" class="panel hidden">
+<h2>French Verb Quiz</h2>
+<p id="question">Press Start Quiz to begin.</p>
+<div id="choices"></div>
+<p id="score"></p>
+<button onclick="startQuiz()">Start Quiz</button>
+</section>
+
+<script>
+const raw = `
+accomplir|to accomplish|amalga oshirmoq
+accueillir|to welcome|kutib olmoq
+achever|to complete|tugatmoq
+acquérir|to acquire|qo'lga kiritmoq
+admettre|to admit|tan olmoq
+adopter|to adopt|qabul qilmoq
+affirmer|to affirm|ta'kidlamoq
+aggraver|to worsen|yomonlashtirmoq
+apercevoir|to notice|payqamoq
+apparaître|to appear|paydo bo'lmoq
+appartenir|to belong|tegishli bo'lmoq
+apprécier|to appreciate|qadrlamoq
+approfondir|to deepen|chuqurlashtirmoq
+assumer|to assume|zimmasiga olmoq
+atteindre|to reach|erishmoq
+avertir|to warn|ogohlantirmoq
+bénéficier|to benefit|foyda ko'rmoq
+bouleverser|to upset|larzaga solmoq
+caractériser|to characterize|tavsiflamoq
+céder|to yield|yon bermoq
+coïncider|to coincide|mos kelmoq
+combattre|to fight|kurashmoq
+commettre|to commit|sodir etmoq
+comprendre|to understand|tushunmoq
+concevoir|to conceive|tasavvur qilmoq
+conclure|to conclude|xulosa qilmoq
+conduire|to drive|haydamoq
+confier|to entrust|ishonib topshirmoq
+conquérir|to conquer|zabt etmoq
+consentir|to consent|rozi bo'lmoq
+considérer|to consider|hisoblamoq
+consister|to consist|iborat bo'lmoq
+consolider|to consolidate|mustahkamlamoq
+constater|to observe|qayd etmoq
+contraindre|to compel|majbur qilmoq
+contredire|to contradict|qarshi chiqmoq
+convenir|to suit|mos kelmoq
+convaincre|to convince|ishontirmoq
+correspondre|to correspond|mos kelmoq
+craindre|to fear|qo'rqmoq
+croître|to grow|o'smoq
+décevoir|to disappoint|hafsalasini pir qilmoq
+découvrir|to discover|kashf etmoq
+décrire|to describe|tasvirlamoq
+déduire|to deduce|xulosa chiqarmoq
+défendre|to defend|himoya qilmoq
+définir|to define|ta'riflamoq
+détenir|to hold|saqlamoq
+développer|to develop|rivojlantirmoq
+différer|to differ|farq qilmoq
+disparaître|to disappear|yo'qolmoq
+dissoudre|to dissolve|eritmoq
+distinguer|to distinguish|farqlamoq
+divertir|to entertain|ko'ngil ochmoq
+échapper|to escape|qochib qutulmoq
+éclaircir|to clarify|oydinlashtirmoq
+effectuer|to carry out|amalga oshirmoq
+élaborer|to develop|ishlab chiqmoq
+émerger|to emerge|yuzaga chiqmoq
+emporter|to take away|olib ketmoq
+encourager|to encourage|rag'batlantirmoq
+endurer|to endure|chidamoq
+enfreindre|to violate|buzmoq
+enrichir|to enrich|boyitmoq
+entreprendre|to undertake|boshlamoq
+entretenir|to maintain|parvarishlamoq
+envahir|to invade|bosib olmoq
+équivaloir|to equal|teng bo'lmoq
+établir|to establish|o'rnatmoq
+exclure|to exclude|chiqarib tashlamoq
+exiger|to demand|talab qilmoq
+exploiter|to exploit|foydalanmoq
+exprimer|to express|ifodalamoq
+faire|to do|qilmoq
+falloir|to be necessary|zarur bo'lmoq
+favoriser|to favour|qo'llab-quvvatlamoq
+feindre|to pretend|o'zini tutmoq
+fournir|to provide|ta'minlamoq
+fuir|to flee|qochmoq
+garantir|to guarantee|kafolat bermoq
+gérer|to manage|boshqarmoq
+ignorer|to ignore|e'tiborsiz qoldirmoq
+impliquer|to involve|jalb qilmoq
+imposer|to impose|yuklamoq
+inclure|to include|o'z ichiga olmoq
+induire|to induce|sabab bo'lmoq
+influer|to influence|ta'sir qilmoq
+inscrire|to register|ro'yxatdan o'tkazmoq
+insister|to insist|qat'iy turmoq
+instaurer|to establish|joriy qilmoq
+intervenir|to intervene|aralashmoq
+interdire|to forbid|taqiqlamoq
+interrompre|to interrupt|to'xtatmoq
+introduire|to introduce|tanishtirmoq
+investir|to invest|sarmoya kiritmoq
+joindre|to join|birlashtirmoq
+maintenir|to maintain|saqlab qolmoq
+mentir|to lie|yolg'on gapirmoq
+mettre|to put|qo'ymoq
+nuire|to harm|zarar yetkazmoq
+obtenir|to obtain|qo'lga kiritmoq
+omettre|to omit|tushirib qoldirmoq
+opposer|to oppose|qarshi chiqmoq
+paraître|to seem|ko'rinmoq
+parvenir|to manage to|uddalamoq
+percevoir|to perceive|idrok etmoq
+permettre|to allow|ruxsat bermoq
+persuader|to persuade|ko'ndirmoq
+poursuivre|to pursue|davom ettirmoq
+pourvoir|to provide|ta'minlamoq
+préconiser|to recommend|tavsiya qilmoq
+prédire|to predict|bashorat qilmoq
+préférer|to prefer|afzal ko'rmoq
+préserver|to preserve|asramoq
+prévaloir|to prevail|ustun kelmoq
+prévenir|to prevent|oldini olmoq
+produire|to produce|ishlab chiqarmoq
+promettre|to promise|va'da bermoq
+provenir|to originate|kelib chiqmoq
+reconnaître|to recognize|tanimoq
+recueillir|to collect|yig'moq
+réduire|to reduce|kamaytirmoq
+réfléchir|to think|o'ylamoq
+rejoindre|to join|qo'shilmoq
+remettre|to hand over|topshirmoq
+renforcer|to strengthen|kuchaytirmoq
+renouveler|to renew|yangilamoq
+répandre|to spread|tarqatmoq
+résoudre|to solve|hal qilmoq
+ressentir|to feel|his qilmoq
+restreindre|to restrict|cheklamoq
+retenir|to retain|eslab qolmoq
+revenir|to return|qaytmoq
+satisfaire|to satisfy|qoniqtirmoq
+savoir|to know|bilmoq
+secourir|to rescue|qutqarmoq
+séduire|to seduce|maftun qilmoq
+sentir|to feel|sezmoq
+servir|to serve|xizmat qilmoq
+soutenir|to support|qo'llab-quvvatlamoq
+souffrir|to suffer|azob chekmoq
+suffire|to suffice|yetarli bo'lmoq
+survenir|to occur|sodir bo'lmoq
+survivre|to survive|omon qolmoq
+taire|to keep quiet|jim turmoq
+tendre|to stretch|cho'zmoq
+tenir|to hold|ushlamoq
+traduire|to translate|tarjima qilmoq
+transmettre|to transmit|uzatmoq
+vaincre|to defeat|mag'lub etmoq
+valoir|to be worth|qiymatga ega bo'lmoq
+vendre|to sell|sotmoq
+venir|to come|kelmoq
+vivre|to live|yashamoq
+voir|to see|ko'rmoq
+vouloir|to want|xohlamoq
+aborder|to approach|yondashmoq
+accorder|to grant|bermoq
+affronter|to face|yuzlashmoq
+améliorer|to improve|yaxshilamoq
+analyser|to analyse|tahlil qilmoq
+anticiper|to anticipate|oldindan kutmoq
+argumenter|to argue|dalil keltirmoq
+assister|to attend|qatnashmoq
+augmenter|to increase|oshirmoq
+collaborer|to collaborate|hamkorlik qilmoq
+compenser|to compensate|qoplamoq
+contribuer|to contribute|hissa qo'shmoq
+démontrer|to demonstrate|isbotlamoq
+désigner|to designate|belgilamoq
+diminuer|to decrease|kamaytirmoq
+disposer|to have available|ega bo'lmoq
+engager|to commit|jalb qilmoq
+envisager|to consider|ko'rib chiqmoq
+étendre|to extend|kengaytirmoq
+évaluer|to evaluate|baholamoq
+évoquer|to mention|eslatib o'tmoq
+exercer|to exercise|amalga oshirmoq
+fonctionner|to function|ishlamoq
+interpréter|to interpret|talqin qilmoq
+justifier|to justify|asoslamoq
+négocier|to negotiate|muzokara qilmoq
+observer|to observe|kuzatmoq
+organiser|to organize|tashkil qilmoq
+participer|to participate|qatnashmoq
+proposer|to propose|taklif qilmoq
+réagir|to react|munosabat bildirmoq
+réaliser|to achieve|amalga oshirmoq
+remplacer|to replace|almashtirmoq
+représenter|to represent|ifodalamoq
+réussir|to succeed|muvaffaqiyatga erishmoq
+risquer|to risk|xavf ostiga qo'ymoq
+signifier|to mean|anglatmoq
+transformer|to transform|o'zgartirmoq
+utiliser|to use|foydalanmoq
+vérifier|to verify|tekshirmoq
+abandonner|to abandon|tashlab ketmoq
+accepter|to accept|qabul qilmoq
+adresser|to address|murojaat qilmoq
+annoncer|to announce|e'lon qilmoq
+apprendre|to learn|o'rganmoq
+assurer|to ensure|ta'minlamoq
+attendre|to wait|kutmoq
+choisir|to choose|tanlamoq
+construire|to build|qurmoq
+dépendre|to depend|bog'liq bo'lmoq
+entendre|to hear|eshitmoq
+envoyer|to send|yubormoq
+étudier|to study|o'qimoq
+expliquer|to explain|tushuntirmoq
+finir|to finish|tugatmoq
+lire|to read|o'qimoq
+ouvrir|to open|ochmoq
+prendre|to take|olmoq
+recevoir|to receive|qabul qilmoq
+rendre|to return|qaytarmoq
+répondre|to answer|javob bermoq
+sortir|to go out|chiqmoq
+suivre|to follow|ergashmoq
+travailler|to work|ishlamoq
+trouver|to find|topmoq
+écrire|to write|yozmoq
+être|to be|bo'lmoq
+avoir|to have|ega bo'lmoq
+aller|to go|bormoq
+dire|to say|aytmoq
+`;
+
+const verbs=raw.trim().split("\n").map(x=>x.split("|"));
+const unique=[...new Map(verbs.map(v=>[v[0],v])).values()];
+const select=document.getElementById("verb");
+unique.sort((a,b)=>a[0].localeCompare(b[0],"fr")).forEach(v=>{
+ let o=document.createElement("option");
+ o.value=v[0];o.textContent=v[0]+" — "+v[1];
+ select.appendChild(o);
+});
+
+function page(id){
+ ["conjugation","grammar","quiz"].forEach(x=>document.getElementById(x).classList.toggle("hidden",x!==id));
+}
+function slug(v){
+ return v.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+}
+function findVerb(){
+ const q=document.getElementById("search").value.trim().toLowerCase();
+ const v=unique.find(x=>x[0].toLowerCase()===q);
+ if(!v){document.getElementById("status").textContent="Verb not found. Try the French infinitive.";return;}
+ select.value=v[0];loadVerb();
+}
+function norm(s){return String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]/g,"");}
+function escapeHTML(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+
+const tenseNames={
+ present:["présent","present"],
+ passeCompose:["passé composé","passe compose","passe-compose"],
+ imparfait:["imparfait"],
+ plusQueParfait:["plus-que-parfait","plus que parfait"],
+ futur:["futur simple","futur"],
+ conditionnel:["présent","present"]
+};
+let data=null;
+
+function findForms(obj,targets,path=[]){
+ if(!obj||typeof obj!=="object")return null;
+ if(Array.isArray(obj)){
+  if(obj.length&&obj.every(x=>x&&typeof x==="object"&&("pronom" in x||"valeur" in x||"texte" in x))){
+   return {forms:obj,path};
+  }
+  for(let i=0;i<obj.length;i++){let r=findForms(obj[i],targets,path.concat(String(i)));if(r)return r;}
+  return null;
+ }
+ for(const [k,v] of Object.entries(obj)){
+  if(targets.includes(norm(k))){
+   let r=findForms(v,targets,path.concat(k));
+   if(r)return r;
+  }
+ }
+ for(const [k,v] of Object.entries(obj)){
+  let r=findForms(v,targets,path.concat(k));
+  if(r)return r;
+ }
+ return null;
+}
+function getForms(){
+ const key=document.getElementById("tense").value;
+ const names=tenseNames[key].map(norm);
+ return findForms(data,names);
+}
+async function loadVerb(){
+ const name=select.value;
+ if(!name)return;
+ document.getElementById("status").textContent="Loading conjugation data...";
+ document.getElementById("result").innerHTML="";
+ const tr=unique.find(v=>v[0]===name);
+ document.getElementById("translation").textContent=tr[1]+" · "+tr[2];
+ try{
+  const res=await fetch("https://conjugaison.app/"+slug(name)+".json");
+  if(!res.ok)throw Error("HTTP "+res.status);
+  data=await res.json();
+  showForms();
+ }catch(e){
+  data=null;
+  document.getElementById("status").textContent="Could not load data for this verb. Check your internet connection and try again.";
+ }
+}
+function showForms(){
+ if(!data)return;
+ const found=getForms();
+ if(!found){
+  document.getElementById("result").innerHTML="<p>This tense could not be located in the returned data. We need to check the dataset format.</p>";
+  document.getElementById("status").textContent="Data received, but tense mapping needs checking.";
+  return;
+ }
+ const rows=found.forms.map(f=>"<tr><td>"+escapeHTML(f.pronom||"")+"</td><td class='answer'>"+escapeHTML(f.texte||f.valeur||"")+"</td></tr>").join("");
+ document.getElementById("result").innerHTML="<h3>"+escapeHTML(select.value)+" — "+escapeHTML(document.getElementById("tense").selectedOptions[0].textContent)+"</h3><table><tr><th>Subject</th><th>Conjugation</th></tr>"+rows+"</table>";
+ document.getElementById("status").textContent="Conjugation data loaded.";
+}
+document.getElementById("tense").addEventListener("change",showForms);
+select.addEventListener("change",loadVerb);
+
+let answer="",points=0;
+async function startQuiz(){
+ const v=unique[Math.floor(Math.random()*unique.length)];
+ document.getElementById("question").textContent="Loading question for "+v[0]+"...";
+ document.getElementById("choices").innerHTML="";
+ try{
+  const res=await fetch("https://conjugaison.app/"+slug(v[0])+".json");
+  if(!res.ok)throw Error();
+  const d=await res.json();
+  const found=findForms(d,["present"]);
+  if(!found||found.forms.length<4)throw Error();
+  const f=found.forms[Math.floor(Math.random()*found.forms.length)];
+  answer=f.texte||f.valeur;
+  const options=[answer];
+  const all=[];
+  function collect(o){
+   if(!o||typeof o!=="object")return;
+   if(Array.isArray(o)){o.forEach(collect);return;}
+   if(o.texte||o.valeur){let x=o.texte||o.valeur;if(x!==answer)all.push(x);return;}
+   Object.values(o).forEach(collect);
+  }
+  collect(d);
+  while(options.length<4&&all.length){
+   const x=all.splice(Math.floor(Math.random()*all.length),1)[0];
+   if(!options.includes(x))options.push(x);
+  }
+  if(options.length<4)throw Error();
+  options.sort(()=>Math.random()-.5);
+  document.getElementById("question").textContent="Choose the correct present form: "+(f.pronom||"")+" ("+v[0]+")";
+  options.forEach(x=>{
+   let b=document.createElement("button");b.textContent=x;b.onclick=()=>check(x);document.getElementById("choices").appendChild(b);
+  });
+ }catch(e){
+  document.getElementById("question").textContent="Quiz data could not be loaded. Please try again.";
+ }
+}
+function check(x){
+ document.getElementById("choices").innerHTML="";
+ if(x===answer){points++;document.getElementById("score").textContent="Correct! Score: "+points;}
+ else document.getElementById("score").textContent="Correct answer: "+answer+" · Score: "+points;
+}
+</script>
+</body>
+</html>
+
