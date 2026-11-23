@@ -1,1 +1,342 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bonjour French 🇫🇷</title>
+<style>
+:root{--green:#287a50;--light:#eaf6ed;--white:#fff;--ink:#23352b}
+*{box-sizing:border-box}
+body{margin:0;background:#f3faf4;color:var(--ink);font-family:Arial,sans-serif}
+header{background:var(--green);color:white;text-align:center;padding:22px 12px}
+header h1{margin:0 0 6px}
+main{max-width:850px;margin:auto;padding:14px}
+.card{background:white;border-radius:15px;padding:17px;margin:14px 0;box-shadow:0 2px 10px #174b2510}
+label{display:block;font-weight:bold;margin:12px 0 6px}
+select,input,button{width:100%;padding:12px;border:1px solid #cbdccf;border-radius:9px;font-size:16px;background:white;color:var(--ink)}
+button{background:var(--green);color:white;border:0;font-weight:bold;margin-top:12px;cursor:pointer}
+button:disabled{opacity:.5}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tabs button{width:auto;flex:1;min-width:90px}
+.tabs button.active{background:#174a30}
+.formrow{display:grid;grid-template-columns:105px 1fr;gap:8px;align-items:center;margin:9px 0}
+.formrow span{font-weight:bold}
+.result{background:var(--light);padding:12px;border-radius:9px;margin-top:10px}
+.correct{color:#168044;font-weight:bold}
+.wrong{color:#c0392b;font-weight:bold}
+.small{font-size:13px;color:#607367}
+#status{white-space:pre-wrap}
+.hidden{display:none}
+footer{text-align:center;padding:20px;color:#607367}
+@media(max-width:480px){.row{grid-template-columns:1fr}.formrow{grid-template-columns:90px 1fr}}
+</style>
+</head>
+<body>
+<header>
+<h1>Bonjour French 🇫🇷</h1>
+<p id="subtitle">Learn and practise French conjugation</p>
+</header>
+
+<main>
+<section class="card">
+<label id="languageLabel" for="language">App language</label>
+<select id="language">
+<option value="en">🇬🇧 English</option>
+<option value="uz">🇺🇿 O‘zbekcha</option>
+<option value="ru">🇷🇺 Русский</option>
+</select>
+</section>
+
+<section class="card">
+<div class="tabs">
+<button id="tabConj" class="active" onclick="showSection('conj')">Conjugation</button>
+<button id="tabQuiz" onclick="showSection('quiz')">Written quiz</button>
+<button id="tabGrammar" onclick="showSection('grammar')">Grammar</button>
+</div>
+</section>
+
+<section id="conj" class="card">
+<h2 id="conjTitle">Find a French verb</h2>
+<label id="searchLabel" for="search">Search a verb</label>
+<input id="search" list="verbList" placeholder="Example: apprendre">
+<datalist id="verbList"></datalist>
+<label id="verbLabel" for="verb">Choose a verb</label>
+<select id="verb"></select>
+<label id="tenseLabel" for="tense">Choose a tense</label>
+<select id="tense"></select>
+<button id="findButton" onclick="loadConjugation()">Find conjugation</button>
+<div id="status" class="small"></div>
+<div id="conjugation"></div>
+</section>
+
+<section id="quiz" class="card hidden">
+<h2 id="quizTitle">Write all six forms</h2>
+<label id="quizVerbLabel" for="quizVerb">Choose a verb</label>
+<select id="quizVerb"></select>
+<label id="quizTenseLabel" for="quizTense">Choose a tense</label>
+<select id="quizTense"></select>
+<button id="startQuiz" onclick="startQuiz()">Start exercise</button>
+<div id="quizArea"></div>
+</section>
+
+<section id="grammar" class="card hidden">
+<h2 id="grammarTitle">French grammar</h2>
+<label id="grammarTenseLabel" for="grammarTense">Choose a tense</label>
+<select id="grammarTense"></select>
+<div id="grammarText" class="result"></div>
+</section>
+</main>
+
+<footer>Bonjour French 🇫🇷</footer>
+
+<script>
+const verbs = `
+abandonner aborder aboutir absorber accepter accompagner accomplir accorder accueillir accroître accuser acheter adhérer admirer admettre adopter adorer adresser agir aimer ajouter alerter améliorer amener analyser annoncer apercevoir apparaître appartenir appeler appliquer apprécier apprendre approcher approfondir assurer atteindre attendre augmenter autoriser avancer avertir avoir bénéficier blâmer bouleverser cacher calculer caractériser causer célébrer cesser changer choisir citer classer collaborer commencer commenter communiquer comparer compléter comprendre compter concevoir conclure conduire confirmer connaître conseiller considérer construire consulter contenir continuer convaincre correspondre corriger coûter couvrir craindre créer croire cultiver décider déclarer découvrir décrire défendre dégager demander démontrer dénoncer dépendre dépenser déplacer décrire désigner désirer détruire développer devenir devoir différencier diminuer diriger discuter disposer distinguer distribuer divertir donner douter durer échanger échouer éclairer écouter écrire effectuer élaborer élever éliminer émerger employer encourager endommager engager enregistrer enseigner entendre entraîner entreprendre entrer envoyer espérer essayer établir étudier éviter évoluer examiner exiger exister expliquer exprimer fabriquer faciliter faire falloir féliciter financer finir fixer fonctionner fournir gagner garantir garder gérer goûter grandir habiter hésiter identifier ignorer illustrer imaginer impliquer imposer inclure indiquer influencer informer inquiéter inscrire installer instituer instruire interdire intéresser interpréter interrompre intervenir introduire inventer investir inviter justifier laisser lancer lire maintenir maîtriser manquer marcher mesurer mettre modifier montrer motiver négocier nommer noter obtenir occuper offrir opposer organiser oublier parler participer partager passer penser permettre persuader placer planifier porter poser posséder poursuivre pouvoir pratiquer préciser préparer présenter préserver prétendre prévoir produire profiter progresser proposer protéger prouver publier qualifier réaliser recevoir reconnaître recommander réduire réfléchir refuser regarder regretter rejoindre remercier remplir rencontrer rendre renforcer rentrer remplacer répondre représenter résoudre respecter ressembler ressentir rester retenir réussir révéler revenir vivre revoir savoir sembler sentir séparer servir signer souhaiter souffrir soutenir soumettre suivre supprimer surprendre survenir survivre tenter terminer tirer tomber toucher tourner traduire traiter travailler transformer transmettre transporter trouver utiliser valoir vendre venir vérifier visiter vivre voir vouloir`.trim().split(/\s+/);
+
+const tenses = [
+{key:"Présent",mode:"Indicatif"},
+{key:"Passé composé",mode:"Indicatif"},
+{key:"Imparfait",mode:"Indicatif"},
+{key:"Plus-que-parfait",mode:"Indicatif"},
+{key:"Futur simple",mode:"Indicatif"},
+{key:"Conditionnel présent",mode:"Conditionnel"}
+];
+
+const people = ["je","tu","il","nous","vous","ils"];
+const personLabels = {
+en:["I","You (singular)","He / She / One","We","You (plural)","They"],
+uz:["Men","Sen","U / U (ayol)","Biz","Siz","Ular"],
+ru:["Я","Ты","Он / Она","Мы","Вы","Они"]
+};
+
+const translations = {
+en:{
+subtitle:"Learn and practise French conjugation",language:"App language",
+conj:"Conjugation",quiz:"Written quiz",grammar:"Grammar",
+find:"Find a French verb",search:"Search a verb",chooseVerb:"Choose a verb",
+chooseTense:"Choose a tense",findButton:"Find conjugation",
+quizTitle:"Write all six forms",quizVerb:"Choose a verb",
+quizTense:"Choose a tense",start:"Start exercise",check:"Check all answers",
+grammarTitle:"French grammar",grammarTense:"Choose a tense",
+loading:"Loading conjugations…",loaded:"Conjugation loaded.",
+error:"Sorry, the conjugation data could not be loaded. Check your internet connection and try again.",
+missing:"Some forms were not found in the database.",
+score:"Your score",correction:"Correct answer",empty:"Please fill in all six answers.",
+placeholder:"Write the conjugated form",
+tenses:["Présent","Passé composé","Imparfait","Plus-que-parfait","Futur simple","Conditionnel présent"],
+grammar:[
+"The présent describes current actions, habits and general facts. Example: je parle.",
+"The passé composé describes a completed past action. It uses avoir or être in the present plus the past participle. Example: j'ai parlé.",
+"The imparfait describes habits, descriptions and ongoing situations in the past. Example: je parlais.",
+"The plus-que-parfait describes an action completed before another past action. It uses avoir or être in the imparfait plus the past participle. Example: j'avais parlé.",
+"The futur simple describes future actions. Example: je parlerai.",
+"The conditionnel présent expresses a possibility, wish or polite request. Example: je parlerais."
+]},
+uz:{
+subtitle:"Fransuz fe'llarini o‘rganing va mashq qiling",language:"Ilova tili",
+conj:"Tuslash",quiz:"Yozma test",grammar:"Grammatika",
+find:"Fransuz fe'lini toping",search:"Fe'lni qidiring",chooseVerb:"Fe'lni tanlang",
+chooseTense:"Zamonni tanlang",findButton:"Tuslanishni ko‘rsatish",
+quizTitle:"Oltita shaklni yozing",quizVerb:"Fe'lni tanlang",
+quizTense:"Zamonni tanlang",start:"Mashqni boshlash",check:"Barcha javoblarni tekshirish",
+grammarTitle:"Fransuz grammatikasi",grammarTense:"Zamonni tanlang",
+loading:"Tuslanish yuklanmoqda…",loaded:"Tuslanish yuklandi.",
+error:"Tuslanish ma'lumotlarini yuklab bo'lmadi. Internetni tekshirib, qayta urinib ko‘ring.",
+missing:"Ma'lumotlar bazasida ayrim shakllar topilmadi.",
+score:"Natijangiz",correction:"To‘g‘ri javob",empty:"Iltimos, oltita javobning barchasini kiriting.",
+placeholder:"Tuslangan shaklni yozing",
+tenses:["Hozirgi zamon","O‘tgan tugallangan zamon","O‘tgan davomiy zamon","Uzoq o‘tgan zamon","Kelasi oddiy zamon","Shart mayli hozirgi zamon"],
+grammar:[
+"Hozirgi zamon hozirgi harakatlar, odatlar va umumiy faktlarni ifodalaydi. Misol: je parle.",
+"Passé composé o'tmishda tugallangan harakatni bildiradi. Avoir yoki être hozirgi zamoni va sifatdosh bilan tuziladi. Misol: j'ai parlé.",
+"Imparfait o'tmishdagi odatlar, tasvirlar va davom etayotgan holatlarni bildiradi. Misol: je parlais.",
+"Plus-que-parfait boshqa o'tmishdagi harakatdan oldin tugagan ishni bildiradi. Avoir yoki être imparfait shakli va sifatdosh bilan tuziladi. Misol: j'avais parlé.",
+"Futur simple kelajakdagi harakatni bildiradi. Misol: je parlerai.",
+"Conditionnel présent ehtimol, istak yoki muloyim iltimosni bildiradi. Misol: je parlerais."
+]},
+ru:{
+subtitle:"Изучайте и практикуйте спряжение французских глаголов",language:"Язык приложения",
+conj:"Спряжение",quiz:"Письменный тест",grammar:"Грамматика",
+find:"Найти французский глагол",search:"Поиск глагола",chooseVerb:"Выберите глагол",
+chooseTense:"Выберите время",findButton:"Показать спряжение",
+quizTitle:"Напишите все шесть форм",quizVerb:"Выберите глагол",
+quizTense:"Выберите время",start:"Начать упражнение",check:"Проверить все ответы",
+grammarTitle:"Французская грамматика",grammarTense:"Выберите время",
+loading:"Загрузка спряжения…",loaded:"Спряжение загружено.",
+error:"Не удалось загрузить данные. Проверьте интернет-соединение и попробуйте снова.",
+missing:"Некоторые формы не найдены в базе данных.",
+score:"Ваш результат",correction:"Правильный ответ",empty:"Пожалуйста, заполните все шесть ответов.",
+placeholder:"Введите форму глагола",
+tenses:["Настоящее время","Сложное прошедшее время","Имперфект","Предпрошедшее время","Простое будущее время","Условное наклонение"],
+grammar:[
+"Présent описывает действия сейчас, привычки и общие факты. Пример: je parle.",
+"Passé composé описывает завершённое действие в прошлом. Образуется с avoir или être в настоящем времени и причастием. Пример: j'ai parlé.",
+"Imparfait описывает привычки, обстановку и длительные действия в прошлом. Пример: je parlais.",
+"Plus-que-parfait описывает действие, завершившееся до другого действия в прошлом. Используется imparfait глагола avoir или être и причастие. Пример: j'avais parlé.",
+"Futur simple описывает действия в будущем. Пример: je parlerai.",
+"Conditionnel présent выражает возможность, желание или вежливую просьбу. Пример: je parlerais."
+]}
+};
+
+let currentLanguage="en";
+let currentForms=null;
+let currentVerb="";
+let currentTense=0;
+const cache={};
+
+function text(id,value){document.getElementById(id).textContent=value}
+function fillSelect(id,items,labels){
+const el=document.getElementById(id);el.innerHTML="";
+items.forEach((item,i)=>{
+const option=document.createElement("option");
+option.value=item;
+option.textContent=labels?labels[i]:item;
+el.appendChild(option);
+});
+}
+function setup(){
+const list=document.getElementById("verbList");
+verbs.forEach(v=>{const o=document.createElement("option");o.value=v;list.appendChild(o)});
+fillSelect("verb",verbs);
+fillSelect("quizVerb",verbs);
+fillSelect("tense",tenses.map(x=>x.key),tenses.map(x=>x.key));
+fillSelect("quizTense",tenses.map(x=>x.key),tenses.map(x=>x.key));
+fillSelect("grammarTense",tenses.map(x=>x.key),tenses.map(x=>x.key));
+document.getElementById("language").addEventListener("change",e=>setLanguage(e.target.value));
+document.getElementById("search").addEventListener("change",e=>{
+const v=e.target.value.trim().toLowerCase();
+if(verbs.includes(v)){document.getElementById("verb").value=v;}
+});
+setLanguage("en");
+}
+function setLanguage(lang){
+currentLanguage=lang;
+const t=translations[lang];
+text("subtitle",t.subtitle);
+text("languageLabel",t.language);
+text("tabConj",t.conj);text("tabQuiz",t.quiz);text("tabGrammar",t.grammar);
+text("conjTitle",t.find);text("searchLabel",t.search);
+text("verbLabel",t.chooseVerb);text("tenseLabel",t.chooseTense);
+text("findButton",t.findButton);
+text("quizTitle",t.quizTitle);text("quizVerbLabel",t.quizVerb);
+text("quizTenseLabel",t.quizTense);text("startQuiz",t.start);
+text("grammarTitle",t.grammarTitle);text("grammarTenseLabel",t.grammarTense);
+document.getElementById("search").placeholder=lang==="en"?"Example: apprendre":lang==="uz"?"Masalan: apprendre":"Например: apprendre";
+document.getElementById("grammarTense").value=tenses[0].key;
+showGrammar();
+if(currentForms)renderConjugation(currentForms);
+}
+function showSection(name){
+["conj","quiz","grammar"].forEach(s=>document.getElementById(s).classList.toggle("hidden",s!==name));
+["tabConj","tabQuiz","tabGrammar"].forEach((id,i)=>document.getElementById(id).classList.toggle("active",["conj","quiz","grammar"][i]===name));
+}
+function normalize(s){
+return (s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+.replace(/[’‘]/g,"'").replace(/[.!?]/g,"").replace(/\s+/g," ").trim();
+}
+function modeAndTense(index){
+return index===5?{mode:"Conditionnel",name:"Présent"}:{mode:"Indicatif",name:tenses[index].key};
+}
+async function getForms(verb,index){
+const key=verb+"|"+index;
+if(cache[key])return cache[key];
+const response=await fetch("https://conjugaison.app/"+encodeURIComponent(verb)+".json");
+if(!response.ok)throw new Error("HTTP "+response.status);
+const data=await response.json();
+const mt=modeAndTense(index);
+const mode=data.modes.find(m=>normalize(m.mode)===normalize(mt.mode));
+if(!mode)throw new Error("Mode not found: "+mt.mode);
+const tense=mode.temps.find(x=>normalize(x.nom)===normalize(mt.name));
+if(!tense)throw new Error("Tense not found: "+mt.name);
+const result=people.map(p=>tense.formes.find(f=>normalize(f.pronom)===p)||null);
+if(result.some(x=>!x))throw new Error("Some forms are missing");
+cache[key]=result;
+return result;
+}
+async function loadConjugation(){
+const verb=document.getElementById("verb").value;
+const index=tenses.findIndex(t=>t.key===document.getElementById("tense").value);
+text("status",translations[currentLanguage].loading);
+document.getElementById("conjugation").innerHTML="";
+try{
+const forms=await getForms(verb,index);
+currentForms=forms;currentVerb=verb;currentTense=index;
+renderConjugation(forms);
+text("status",translations[currentLanguage].loaded);
+}catch(e){
+text("status",translations[currentLanguage].error+"\n"+e.message);
+}
+}
+function renderConjugation(forms){
+const box=document.getElementById("conjugation");
+box.innerHTML="";
+forms.forEach((f,i)=>{
+const row=document.createElement("div");row.className="result";
+const strong=document.createElement("strong");
+strong.textContent=personLabels[currentLanguage][i]+": ";
+const span=document.createElement("span");span.textContent=f.texte;
+row.append(strong,span);box.appendChild(row);
+});
+}
+function showGrammar(){
+const index=tenses.findIndex(t=>t.key===document.getElementById("grammarTense").value);
+document.getElementById("grammarText").textContent=translations[currentLanguage].grammar[index<0?0:index];
+}
+document.getElementById("grammarTense").addEventListener("change",showGrammar);
+
+async function startQuiz(){
+const verb=document.getElementById("quizVerb").value;
+const index=tenses.findIndex(t=>t.key===document.getElementById("quizTense").value);
+const area=document.getElementById("quizArea");
+area.innerHTML=translations[currentLanguage].loading;
+try{
+const forms=await getForms(verb,index);
+area.innerHTML="";
+forms.forEach((f,i)=>{
+const row=document.createElement("div");row.className="formrow";
+const label=document.createElement("span");label.textContent=personLabels[currentLanguage][i];
+const input=document.createElement("input");
+input.type="text";input.autocomplete="off";
+input.placeholder=translations[currentLanguage].placeholder;
+input.dataset.answer=f.valeur;
+input.dataset.full=f.texte;
+row.append(label,input);area.appendChild(row);
+});
+const button=document.createElement("button");
+button.textContent=translations[currentLanguage].check;
+button.onclick=()=>checkAnswers();
+area.appendChild(button);
+const result=document.createElement("div");result.id="quizResult";area.appendChild(result);
+}catch(e){area.textContent=translations[currentLanguage].error+" "+e.message;}
+}
+function checkAnswers(){
+const area=document.getElementById("quizArea");
+const inputs=[...area.querySelectorAll("input")];
+if(inputs.some(i=>!i.value.trim())){
+alert(translations[currentLanguage].empty);return;
+}
+let score=0;
+inputs.forEach((input,i)=>{
+const given=normalize(input.value);
+const answer=normalize(input.dataset.answer);
+const full=normalize(input.dataset.full);
+const subject=normalize(people[i]);
+const fullWithoutSubject=full.replace(new RegExp("^"+subject+"\\s*"),"");
+const accepted=[answer,full,fullWithoutSubject];
+const ok=accepted.includes(given);
+if(ok)score++;
+const row=input.parentElement;
+let feedback=row.querySelector(".feedback");
+if(!feedback){feedback=document.createElement("div");feedback.className="feedback";row.appendChild(feedback);}
+feedback.className="feedback "+(ok?"correct":"wrong");
+feedback.textContent=ok?"✓": "✗ "+translations[currentLanguage].correction+": "+input.dataset.answer;
+});
+document.getElementById("quizResult").textContent=translations[currentLanguage].score+": "+score+"/6";
+}
+setup();
+</script>
+</body>
+</html>
+
