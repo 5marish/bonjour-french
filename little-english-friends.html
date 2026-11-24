@@ -1,1 +1,286 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Little English Friends</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:'Trebuchet MS',Arial,sans-serif;background:#fff8e9;color:#35413a}
+header{background:linear-gradient(120deg,#a8e6cf,#dcedc1);padding:18px 12px 25px;text-align:center;border-radius:0 0 35px 35px}
+h1{margin:5px;color:#27634d;font-size:clamp(25px,6vw,38px)}
+header p{margin:5px;color:#356b55}
+.top{display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap;margin:12px}
+select{padding:10px;border:2px solid #b6ddc6;border-radius:15px;background:white;font-size:16px}
+nav{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:15px auto}
+nav button,.btn{border:0;border-radius:18px;padding:12px 20px;font-size:17px;font-weight:bold;background:#ffcf70;color:#59451e;cursor:pointer;box-shadow:0 3px 0 #e4ad4d}
+nav button.active{background:#72c99d;color:white;box-shadow:0 3px 0 #419c70}
+main{max-width:1000px;margin:auto;padding:12px}
+.panel{background:white;border-radius:25px;padding:18px;margin:12px 0;box-shadow:0 5px 18px #d8cdbb55}
+.welcome{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center}
+.toto{width:125px;max-width:32%;height:auto;flex-shrink:0}
+.speech{background:#fff2c9;border-radius:22px;padding:15px;flex:1;min-width:180px;font-size:18px}
+.themes{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:14px}
+.theme{border:0;background:#fff9ec;border-radius:20px;overflow:hidden;padding:0;cursor:pointer;text-align:left;box-shadow:0 3px 10px #ddd}
+.theme img{width:100%;height:125px;object-fit:cover;display:block}
+.theme strong{display:block;padding:12px;font-size:17px;color:#315d48}
+h2{color:#367a58}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:15px}
+.wordcard{background:#f4fff5;border-radius:20px;padding:12px;text-align:center}
+.wordcard img{width:100%;height:165px;object-fit:cover;border-radius:15px}
+.wordcard h3{font-size:25px;margin:8px}
+.wordcard p{margin:5px;color:#617267}
+button:active{transform:scale(.97)}
+.big{font-size:23px}
+.actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:15px}
+.btn.green{background:#79d2a1;color:#174b34;box-shadow:0 3px 0 #4ba979}
+.btn.pink{background:#ffb6c9;color:#70334b;box-shadow:0 3px 0 #e58ba4}
+#puzzleArea{text-align:center}
+.puzzleGrid{display:grid;grid-template-columns:repeat(2,minmax(110px,180px));gap:8px;justify-content:center;margin:18px auto}
+.piece,.slot{width:100%;aspect-ratio:1;border-radius:13px;overflow:hidden}
+.piece{border:3px solid #f5c75e;cursor:pointer;background-repeat:no-repeat;background-size:200% 200%}
+.piece.selected{outline:5px solid #73c99b}
+.slot{border:3px dashed #b8cbbd;background:#f6f8f3;display:flex;align-items:center;justify-content:center;color:#a5b2a8;font-size:26px}
+.slot.filled{border:3px solid #78c99b;background-repeat:no-repeat;background-size:200% 200%}
+#message{font-size:21px;font-weight:bold;color:#39865d;min-height:35px}
+.stars{font-size:25px;color:#e8a900}
+footer{text-align:center;color:#799080;padding:25px}
+@media(max-width:480px){.theme img{height:110px}.panel{padding:13px}.speech{font-size:16px}}
+</style>
+</head>
+<body>
+<header>
+<h1>🌈 Little English Friends</h1>
+<p id="subtitle">Play, learn and grow with Toto!</p>
+<div class="top">
+<label for="language">🌍</label>
+<select id="language" onchange="changeLanguage()">
+<option value="en">English</option>
+<option value="uz">O‘zbekcha</option>
+<option value="ru">Русский</option>
+</select>
+</div>
+<nav>
+<button id="homeTab" class="active" onclick="showPage('home')">🏡 Home</button>
+<button id="learnTab" onclick="showPage('learn')">📚 Learn</button>
+<button id="quizTab" onclick="showPage('quiz')">🧩 Puzzle</button>
+</nav>
+</header>
+
+<main>
+<section id="homePage">
+<div class="panel welcome">
+<svg class="toto" viewBox="0 0 180 170" xmlns="http://www.w3.org/2000/svg" aria-label="Toto the turtle">
+<ellipse cx="91" cy="112" rx="62" ry="39" fill="#55b985" stroke="#327b59" stroke-width="4"/>
+<path d="M45 104 Q48 49 93 46 Q142 48 143 105 Q96 139 45 104" fill="#86d5a3" stroke="#327b59" stroke-width="4"/>
+<path d="M60 88 Q90 56 128 87 M58 107 Q92 83 130 108 M90 52 L90 125" fill="none" stroke="#4c9b70" stroke-width="3"/>
+<ellipse cx="143" cy="75" rx="31" ry="29" fill="#9be2b1" stroke="#327b59" stroke-width="4"/>
+<circle cx="153" cy="68" r="4" fill="#253c32"/><circle cx="133" cy="68" r="4" fill="#253c32"/>
+<path d="M137 83 Q144 92 153 82" fill="none" stroke="#327b59" stroke-width="3" stroke-linecap="round"/>
+<ellipse cx="133" cy="80" rx="6" ry="4" fill="#f69ca6"/><ellipse cx="157" cy="80" rx="6" ry="4" fill="#f69ca6"/>
+<path d="M119 49 L131 19 L148 47" fill="#ffcf70" stroke="#b98538" stroke-width="3"/>
+<path d="M116 47 Q133 35 151 47" fill="#fff0bd" stroke="#b98538" stroke-width="3"/>
+<ellipse cx="54" cy="145" rx="15" ry="10" fill="#8bd8a6"/><ellipse cx="111" cy="148" rx="15" ry="10" fill="#8bd8a6"/>
+<path d="M31 103 Q13 95 12 111 Q16 127 39 122" fill="#8bd8a6" stroke="#327b59" stroke-width="3"/>
+<path d="M140 112 Q159 106 164 119" fill="none" stroke="#327b59" stroke-width="3"/>
+</svg>
+<div class="speech">
+<strong id="hello">Hello, little friend! I'm Toto! 🐢</strong>
+<p id="welcomeText">Let's learn English together. Choose a picture!</p>
+<button class="btn green" onclick="speak(currentHello())">🔊 <span id="listenHello">Listen</span></button>
+</div>
+</div>
+<div class="panel">
+<h2 id="chooseTheme">🌟 Choose a world to explore!</h2>
+<div class="themes" id="themeGrid"></div>
+</div>
+</section>
+
+<section id="learnPage" hidden>
+<div class="panel">
+<div class="welcome">
+<svg class="toto" viewBox="0 0 180 170" xmlns="http://www.w3.org/2000/svg">
+<ellipse cx="91" cy="112" rx="62" ry="39" fill="#55b985" stroke="#327b59" stroke-width="4"/><path d="M45 104 Q48 49 93 46 Q142 48 143 105 Q96 139 45 104" fill="#86d5a3" stroke="#327b59" stroke-width="4"/><path d="M60 88 Q90 56 128 87 M58 107 Q92 83 130 108" fill="none" stroke="#4c9b70" stroke-width="3"/><ellipse cx="143" cy="75" rx="31" ry="29" fill="#9be2b1" stroke="#327b59" stroke-width="4"/><circle cx="153" cy="68" r="4"/><circle cx="133" cy="68" r="4"/><path d="M137 83 Q144 92 153 82" fill="none" stroke="#327b59" stroke-width="3"/><path d="M119 49 L131 19 L148 47" fill="#ffcf70" stroke="#b98538" stroke-width="3"/>
+</svg>
+<div class="speech"><strong id="learnGreeting">Let's learn new words!</strong><p id="learnInstruction">Tap a picture to hear the English word.</p></div>
+</div>
+<h2 id="lessonTitle">Choose a theme</h2>
+<div class="cards" id="wordCards"></div>
+<div class="actions"><button class="btn" onclick="showPage('home')" id="backHome">🏡 Home</button><button class="btn green" onclick="showPage('quiz')" id="tryPuzzle">🧩 Play puzzle</button></div>
+</div>
+</section>
+
+<section id="quizPage" hidden>
+<div class="panel" id="puzzleArea">
+<div class="welcome">
+<svg class="toto" viewBox="0 0 180 170" xmlns="http://www.w3.org/2000/svg">
+<ellipse cx="91" cy="112" rx="62" ry="39" fill="#55b985" stroke="#327b59" stroke-width="4"/><path d="M45 104 Q48 49 93 46 Q142 48 143 105 Q96 139 45 104" fill="#86d5a3" stroke="#327b59" stroke-width="4"/><path d="M60 88 Q90 56 128 87 M58 107 Q92 83 130 108" fill="none" stroke="#4c9b70" stroke-width="3"/><ellipse cx="143" cy="75" rx="31" ry="29" fill="#9be2b1" stroke="#327b59" stroke-width="4"/><circle cx="153" cy="68" r="4"/><circle cx="133" cy="68" r="4"/><path d="M137 83 Q144 92 153 82" fill="none" stroke="#327b59" stroke-width="3"/><path d="M119 49 L131 19 L148 47" fill="#ffcf70" stroke="#b98538" stroke-width="3"/>
+</svg>
+<div class="speech"><strong id="quizGreeting">Let's make a picture!</strong><p id="quizInstruction">Listen to Toto. Find the pieces and complete the puzzle.</p><button class="btn green" onclick="speak(puzzleWord())">🔊 <span id="hearWord">Hear the word</span></button></div>
+</div>
+<h2 id="puzzleTitle">🧩 Put the picture together!</h2>
+<div class="stars" id="starCount">⭐ 0</div>
+<div id="pieces" class="puzzleGrid"></div>
+<p id="message"></p>
+<div class="actions">
+<button class="btn" onclick="newPuzzle()" id="newPuzzle">🔄 New puzzle</button>
+<button class="btn pink" onclick="showPage('learn')" id="learnAgain">📚 Learn words</button>
+</div>
+</div>
+</section>
+</main>
+<footer>💚 Made with love for little learners · Toto the Turtle 🐢</footer>
+
+<script>
+const photo = {
+weather:"https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=700",
+sun:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=700",
+rain:"https://images.unsplash.com/photo-1519692933481-e162a57d6721?w=700",
+snow:"https://images.unsplash.com/photo-1517299321609-52687d1bc55a?w=700",
+animals:"https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=700",
+cat:"https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=700",
+dog:"https://images.unsplash.com/photo-1552053831-71594a27632d?w=700",
+elephant:"https://images.unsplash.com/photo-1564760055775-d63b17a55c44?w=700",
+fruits:"https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=700",
+apple:"https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=700",
+banana:"https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=700",
+orange:"https://images.unsplash.com/photo-1547514701-42782101795e?w=700",
+colours:"https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?w=700",
+shapes:"https://images.unsplash.com/photo-1509228468518-180dd4864904?w=700",
+numbers:"https://images.unsplash.com/photo-1509228468518-180dd4864904?w=700",
+alphabet:"https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=700",
+body:"https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=700",
+transport:"https://images.unsplash.com/photo-1500534623283-312aade485b7?w=700",
+car:"https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=700",
+train:"https://images.unsplash.com/photo-1474487548417-781cb71495f3?w=700",
+plane:"https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=700",
+family:"https://images.unsplash.com/photo-1511895426328-dc8714191300?w=700",
+home:"https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=700",
+food:"https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=700",
+clothes:"https://images.unsplash.com/photo-1483985988355-763728e1935b?w=700",
+feelings:"https://images.unsplash.com/photo-1491013516836-7db643ee125a?w=700",
+routines:"https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=700"
+};
+
+const themes=[
+{id:"weather",en:"Weather & Seasons",uz:"Ob-havo va fasllar",ru:"Погода и времена года",img:photo.weather,words:[
+["Sun","Quyosh","Солнце",photo.sun],["Rain","Yomg‘ir","Дождь",photo.rain],["Snow","Qor","Снег",photo.snow]]},
+{id:"animals",en:"Animals",uz:"Hayvonlar",ru:"Животные",img:photo.animals,words:[
+["Cat","Mushuk","Кошка",photo.cat],["Dog","It","Собака",photo.dog],["Elephant","Fil","Слон",photo.elephant]]},
+{id:"fruits",en:"Fruits",uz:"Mevalar",ru:"Фрукты",img:photo.fruits,words:[
+["Apple","Olma","Яблоко",photo.apple],["Banana","Banan","Банан",photo.banana],["Orange","Apelsin","Апельсин",photo.orange]]},
+{id:"colours",en:"Colours & Shapes",uz:"Ranglar va shakllar",ru:"Цвета и формы",img:photo.colours,words:[
+["Red","Qizil","Красный",photo.colours],["Blue","Ko‘k","Синий",photo.shapes],["Circle","Doira","Круг",photo.shapes]]},
+{id:"numbers",en:"Numbers",uz:"Sonlar",ru:"Числа",img:photo.numbers,words:[
+["One","Bir","Один",photo.numbers],["Two","Ikki","Два",photo.numbers],["Three","Uch","Три",photo.numbers]]},
+{id:"alphabet",en:"Alphabet",uz:"Alifbo",ru:"Алфавит",img:photo.alphabet,words:[
+["A","A harfi","Буква А",photo.alphabet],["B","B harfi","Буква Б",photo.alphabet],["C","C harfi","Буква С",photo.alphabet]]},
+{id:"body",en:"Body Parts",uz:"Tana a’zolari",ru:"Части тела",img:photo.body,words:[
+["Head","Bosh","Голова",photo.body],["Eyes","Ko‘zlar","Глаза",photo.body],["Hands","Qo‘llar","Руки",photo.body]]},
+{id:"transport",en:"Transport",uz:"Transport",ru:"Транспорт",img:photo.transport,words:[
+["Car","Mashina","Машина",photo.car],["Train","Poyezd","Поезд",photo.train],["Airplane","Samolyot","Самолёт",photo.plane]]},
+{id:"family",en:"Family",uz:"Oila",ru:"Семья",img:photo.family,words:[
+["Mother","Ona","Мама",photo.family],["Father","Ota","Папа",photo.family],["Baby","Chaqaloq","Малыш",photo.family]]},
+{id:"home",en:"Home & Furniture",uz:"Uy va mebel",ru:"Дом и мебель",img:photo.home,words:[
+["Home","Uy","Дом",photo.home],["Chair","Stul","Стул",photo.home],["Bed","Karavot","Кровать",photo.home]]},
+{id:"food",en:"Food & Drinks",uz:"Oziq-ovqat va ichimliklar",ru:"Еда и напитки",img:photo.food,words:[
+["Bread","Non","Хлеб",photo.food],["Milk","Sut","Молоко",photo.food],["Water","Suv","Вода",photo.food]]},
+{id:"clothes",en:"Clothes",uz:"Kiyimlar",ru:"Одежда",img:photo.clothes,words:[
+["Shirt","Ko‘ylak","Рубашка",photo.clothes],["Shoes","Oyoq kiyim","Обувь",photo.clothes],["Hat","Shlyapa","Шляпа",photo.clothes]]},
+{id:"feelings",en:"Feelings",uz:"His-tuyg‘ular",ru:"Чувства",img:photo.feelings,words:[
+["Happy","Xursand","Счастливый",photo.feelings],["Sad","Xafa","Грустный",photo.feelings],["Tired","Charchagan","Уставший",photo.feelings]]},
+{id:"routines",en:"Daily Routines",uz:"Kundalik ishlar",ru:"Распорядок дня",img:photo.routines,words:[
+["Wake up","Uyg‘onmoq","Просыпаться",photo.routines],["Eat","Ovqatlanmoq","Есть",photo.food],["Sleep","Uxlamoq","Спать",photo.home]]}
+];
+
+let lang="en",currentTheme=themes[0],currentWord=themes[0].words[0],selectedPiece=null,stars=0,filled=[];
+const translations={
+en:{subtitle:"Play, learn and grow with Toto!",home:"🏡 Home",learn:"📚 Learn",quiz:"🧩 Puzzle",hello:"Hello, little friend! I'm Toto!",welcome:"Let's learn English together. Choose a picture!",listen:"Listen",choose:"🌟 Choose a world to explore!",learnHi:"Let's learn new words!",learnIns:"Tap a picture to hear the English word.",chooseTheme:"Choose a theme",back:"🏡 Home",try:"🧩 Play puzzle",quizHi:"Let's make a picture!",quizIns:"Listen to Toto. Put the picture pieces together.",hear:"Hear the word",puzzle:"🧩 Put the picture together!",new:"🔄 New puzzle",again:"📚 Learn words",great:"Wonderful! You did it! ⭐",tryAgain:"Tap a piece, then tap its matching place.",correct:"That's right! Amazing!",finished:"Wonderful! You completed the picture! ⭐"},
+uz:{subtitle:"Toto bilan o‘yna, o‘rgan va ulg‘ay!",home:"🏡 Bosh sahifa",learn:"📚 O‘rganish",quiz:"🧩 Pazl",hello:"Salom, kichkina do‘stim! Men Totoman!",welcome:"Keling, ingliz tilini birga o‘rganamiz!",listen:"Tinglash",choose:"🌟 O‘rganish uchun mavzuni tanla!",learnHi:"Yangi so‘zlarni o‘rganamiz!",learnIns:"Inglizcha so‘zni eshitish uchun rasmni bos.",chooseTheme:"Mavzuni tanla",back:"🏡 Bosh sahifa",try:"🧩 Pazl o‘ynash",quizHi:"Rasmni birga yasaymiz!",quizIns:"Totoni tingla. Rasm bo‘laklarini joylashtir.",hear:"So‘zni tingla",puzzle:"🧩 Rasmni yig‘!",new:"🔄 Yangi pazl",again:"📚 So‘zlarni o‘rganish",great:"Ajoyib! Buni uddalading! ⭐",tryAgain:"Bir bo‘lakni, keyin uning joyini bos.",correct:"To‘g‘ri! Barakalla!",finished:"Ajoyib! Rasmni tugatding! ⭐"},
+ru:{subtitle:"Играй, учись и расти вместе с Тото!",home:"🏡 Главная",learn:"📚 Учиться",quiz:"🧩 Пазл",hello:"Привет, мой маленький друг! Я Тото!",welcome:"Давай учить английский вместе!",listen:"Слушать",choose:"🌟 Выбери тему для изучения!",learnHi:"Давай учить новые слова!",learnIns:"Нажми на картинку, чтобы услышать слово.",chooseTheme:"Выбери тему",back:"🏡 Главная",try:"🧩 Играть в пазл",quizHi:"Соберём картинку!",quizIns:"Слушай Тото. Собери кусочки картинки.",hear:"Послушать слово",puzzle:"🧩 Собери картинку!",new:"🔄 Новый пазл",again:"📚 Учить слова",great:"Замечательно! У тебя получилось! ⭐",tryAgain:"Нажми на кусочек, затем на его место.",correct:"Правильно! Молодец!",finished:"Замечательно! Ты собрал картинку! ⭐"}
+};
+function t(k){return translations[lang][k]||k}
+function currentHello(){return lang==="uz"?"Salom, do‘stim!":lang==="ru"?"Привет, мой друг!":"Hello, my friend!"}
+function speak(word){if(!('speechSynthesis'in window))return;speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(word);u.lang="en-US";u.rate=.82;speechSynthesis.speak(u)}
+function themeName(th){return th[lang]||th.en}
+function changeLanguage(){lang=document.getElementById("language").value;updateText();renderThemes();renderWords()}
+function updateText(){
+document.getElementById("subtitle").textContent=t("subtitle");
+document.getElementById("homeTab").textContent=t("home");
+document.getElementById("learnTab").textContent=t("learn");
+document.getElementById("quizTab").textContent=t("quiz");
+document.getElementById("hello").textContent=t("hello");
+document.getElementById("welcomeText").textContent=t("welcome");
+document.getElementById("listenHello").textContent=t("listen");
+document.getElementById("chooseTheme").textContent=t("choose");
+document.getElementById("learnGreeting").textContent=t("learnHi");
+document.getElementById("learnInstruction").textContent=t("learnIns");
+document.getElementById("backHome").textContent=t("back");
+document.getElementById("tryPuzzle").textContent=t("try");
+document.getElementById("quizGreeting").textContent=t("quizHi");
+document.getElementById("quizInstruction").textContent=t("quizIns");
+document.getElementById("hearWord").textContent=t("hear");
+document.getElementById("puzzleTitle").textContent=t("puzzle");
+document.getElementById("newPuzzle").textContent=t("new");
+document.getElementById("learnAgain").textContent=t("again");
+}
+function showPage(page){
+["home","learn","quiz"].forEach(p=>{document.getElementById(p+"Page").hidden=p!==page;document.getElementById(p+"Tab").classList.toggle("active",p===page)});
+if(page==="learn")renderWords();
+if(page==="quiz")newPuzzle();
+window.scrollTo({top:0,behavior:"smooth"});
+}
+function renderThemes(){
+document.getElementById("themeGrid").innerHTML=themes.map((th,i)=>`<button class="theme" onclick="chooseTheme(${i})"><img src="${th.img}" alt="${th.en}" loading="lazy"><strong>${themeName(th)}</strong></button>`).join("");
+}
+function chooseTheme(i){currentTheme=themes[i];showPage("learn");document.getElementById("lessonTitle").textContent=themeName(currentTheme)}
+function renderWords(){
+document.getElementById("lessonTitle").textContent=themeName(currentTheme);
+document.getElementById("wordCards").innerHTML=currentTheme.words.map(w=>`<div class="wordcard"><img src="${w[3]}" alt="${w[0]}" loading="lazy"><h3>${w[0]}</h3><p>${w[lang==="uz"?1:lang==="ru"?2:0]===w[0]?"":w[lang==="uz"?1:lang==="ru"?2:0]}</p><button class="btn green" onclick="speak('${w[0].replace(/'/g,"")}')">🔊 Listen</button></div>`).join("");
+}
+function puzzleWord(){return currentWord[0]}
+function newPuzzle(){
+currentTheme=themes[Math.floor(Math.random()*themes.length)];
+currentWord=currentTheme.words[Math.floor(Math.random()*currentTheme.words.length)];
+selectedPiece=null;filled=[false,false,false,false];
+document.getElementById("lessonTitle").textContent=themeName(currentTheme);
+document.getElementById("message").textContent="";
+document.getElementById("puzzleTitle").textContent=t("puzzle")+" "+themeName(currentTheme);
+let order=[0,1,2,3].sort(()=>Math.random()-.5);
+let html="";
+order.forEach(n=>{html+=`<div class="piece" data-piece="${n}" style="background-image:url('${currentWord[3]}');background-position:${n%2?100:0}% ${n>1?100:0}%" onclick="selectPiece(${n},this)"></div>`});
+for(let i=0;i<4;i++)html+=`<div class="slot" id="slot${i}" onclick="placePiece(${i})">?</div>`;
+document.getElementById("pieces").innerHTML=html;
+document.getElementById("starCount").textContent="⭐ "+stars;
+speak(currentWord[0]);
+}
+function selectPiece(n,el){
+document.querySelectorAll(".piece").forEach(p=>p.classList.remove("selected"));
+selectedPiece=n;el.classList.add("selected");
+}
+function placePiece(slot){
+if(selectedPiece===null){document.getElementById("message").textContent=t("tryAgain");return}
+if(selectedPiece!==slot){document.getElementById("message").textContent=t("tryAgain");return}
+if(filled[slot])return;
+filled[slot]=true;
+let el=document.getElementById("slot"+slot);
+el.classList.add("filled");el.textContent="";
+el.style.backgroundImage=`url('${currentWord[3]}')`;
+el.style.backgroundPosition=`${slot%2?100:0}% ${slot>1?100:0}%`;
+let piece=document.querySelector(`.piece[data-piece="${selectedPiece}"]`);
+if(piece)piece.style.visibility="hidden";
+selectedPiece=null;
+if(filled.every(Boolean)){
+stars++;document.getElementById("starCount").textContent="⭐ "+stars;
+document.getElementById("message").textContent=t("finished")+" "+currentWord[0];
+speak(currentWord[0]+". Wonderful! You did it!");
+}else{
+document.getElementById("message").textContent=t("correct");
+}
+}
+updateText();renderThemes();renderWords();
+</script>
+</body>
+</html>
+
