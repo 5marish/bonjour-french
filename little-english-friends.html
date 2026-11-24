@@ -1,1 +1,271 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#fff4df">
+<title>Little English Friends</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#fff8ed;color:#35434b;font-family:Arial,sans-serif}
+header{background:#bcebdc;padding:20px 14px;text-align:center;border-radius:0 0 28px 28px}
+h1{margin:0;color:#286b5a;font-size:27px}
+header p{margin:7px 0}
+select,button{font-size:16px;border:0;border-radius:15px;padding:12px 16px;cursor:pointer}
+select{background:white;margin-top:8px}
+nav{display:flex;gap:9px;justify-content:center;padding:14px;flex-wrap:wrap}
+nav button{background:#ffe2a8;color:#614b25;font-weight:bold}
+nav button.active{background:#71cdb0;color:#174e40}
+main{max-width:850px;margin:auto;padding:12px}
+h2{text-align:center;color:#347b68}
+.intro{background:white;border-radius:22px;padding:16px;text-align:center;box-shadow:0 3px 12px #0000000b}
+.scene{width:100%;max-height:300px;display:block;margin:auto;border-radius:20px;background:#c9efff}
+.toto{font-size:18px;color:#397663;font-weight:bold;margin:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin:16px 0}
+.theme{background:white;border:3px solid #f6dfb9;border-radius:19px;padding:16px 8px;text-align:center;cursor:pointer;font-size:16px;font-weight:bold;color:#4b5b5b;min-height:95px}
+.theme:active,.word:active{transform:scale(.98)}
+.word{background:white;border-radius:20px;padding:16px;margin:12px 0;text-align:center;border:2px solid #d8eee5}
+.word strong{display:block;font-size:27px;color:#28745f;margin:5px}
+.word span{font-size:17px;color:#68777a}
+.word button{background:#c9efdf;margin:5px}
+.action{background:#65c7a6;color:#164b3c;font-weight:bold;margin:8px}
+.secondary{background:#ffe2a8;color:#654b20;font-weight:bold;margin:8px}
+.question{font-size:23px;text-align:center;margin:22px 0}
+.answer{display:block;width:100%;background:white;border:2px solid #d8e9df;margin:10px 0;font-weight:bold}
+.feedback{text-align:center;font-size:19px;font-weight:bold;min-height:30px;padding:8px}
+.small{font-size:14px;color:#718080}
+footer{text-align:center;padding:25px;color:#789087}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<header>
+<h1>Little English Friends</h1>
+<p id="tagline">Learn English with Toto the turtle!</p>
+<label id="languageLabel" for="language">Choose your language:</label><br>
+<select id="language" onchange="changeLanguage()">
+<option value="en">English</option>
+<option value="uz">O‘zbekcha</option>
+<option value="ru">Русский</option>
+</select>
+</header>
+
+<nav>
+<button id="homeBtn" class="active" onclick="showPage('home')">Home</button>
+<button id="learnBtn" onclick="showPage('learn')">Learn</button>
+<button id="quizBtn" onclick="showPage('quiz')">Quiz</button>
+</nav>
+
+<main>
+<section id="home">
+<div class="intro">
+<svg class="scene" viewBox="0 0 700 300" role="img" aria-label="A sunny garden with Toto the turtle">
+<defs>
+<linearGradient id="sky" x2="0" y2="1"><stop stop-color="#83d8f5"/><stop offset="1" stop-color="#e0f8ff"/></linearGradient>
+</defs>
+<rect width="700" height="300" fill="url(#sky)"/>
+<circle cx="580" cy="65" r="39" fill="#ffdb57"/>
+<path d="M0 220 Q180 160 350 225 T700 210 V300 H0" fill="#83ce86"/>
+<path d="M0 260 Q200 220 400 260 T700 245 V300 H0" fill="#55ad72"/>
+<g fill="white"><ellipse cx="130" cy="70" rx="55" ry="20"/><ellipse cx="165" cy="58" rx="35" ry="25"/><ellipse cx="95" cy="57" rx="30" ry="20"/></g>
+<g transform="translate(260 100)">
+<ellipse cx="115" cy="135" rx="105" ry="76" fill="#e9a85d" stroke="#81562e" stroke-width="6"/>
+<path d="M35 130 Q115 30 195 130 Q175 210 55 205Z" fill="#64b77b" stroke="#397a52" stroke-width="6"/>
+<path d="M115 58 L115 190 M48 119 L180 119 M70 76 L160 170 M160 76 L70 170" fill="none" stroke="#397a52" stroke-width="5"/>
+<ellipse cx="220" cy="105" rx="48" ry="52" fill="#8bd18d" stroke="#397a52" stroke-width="5"/>
+<circle cx="236" cy="91" r="7" fill="#263b34"/><circle cx="237" cy="89" r="2" fill="white"/>
+<path d="M228 119 Q245 130 258 116" fill="none" stroke="#397a52" stroke-width="4" stroke-linecap="round"/>
+<ellipse cx="60" cy="205" rx="28" ry="16" fill="#8bd18d"/>
+<ellipse cx="165" cy="207" rx="28" ry="16" fill="#8bd18d"/>
+<ellipse cx="7" cy="155" rx="22" ry="15" fill="#8bd18d"/>
+</g>
+<g fill="#fff"><path d="M85 225q-20-35-40 0q-20-35-40 0q30 20 40 0q20 20 40 0"/></g>
+<text x="350" y="28" font-size="20" text-anchor="middle" fill="#276b5b" font-weight="bold">Hello, little learners!</text>
+</svg>
+<div class="toto" id="welcome">Hello! I am Toto. Let's learn English together!</div>
+<button class="action" onclick="speak(welcomeText())" id="helloVoice">Listen to Toto</button>
+</div>
+<h2 id="chooseTitle">Choose a learning theme</h2>
+<div class="grid" id="homeThemes"></div>
+</section>
+
+<section id="learn" class="hidden">
+<h2 id="learnTitle">Let's learn!</h2>
+<div id="lessonContent"></div>
+<button class="secondary" onclick="showPage('home')" id="backHome">Back to themes</button>
+</section>
+
+<section id="quiz" class="hidden">
+<h2 id="quizTitle">Toto's Quiz</h2>
+<div class="intro">
+<p id="quizInstruction">Choose the correct English word.</p>
+<div class="question" id="question">Ready to play?</div>
+<div id="answers"></div>
+<div class="feedback" id="feedback"></div>
+<p id="score">Score: 0</p>
+<button class="action" onclick="startQuiz()" id="startQuiz">Start quiz</button>
+</div>
+</section>
+</main>
+<footer>Made with love for little learners • Toto the turtle</footer>
+
+<script>
+const translations={
+en:{tag:"Learn English with Toto the turtle!",language:"Choose your language:",home:"Home",learn:"Learn",quiz:"Quiz",welcome:"Hello! I am Toto. Let's learn English together!",listen:"Listen to Toto",choose:"Choose a learning theme",learnTitle:"Let's learn!",back:"Back to themes",quizTitle:"Toto's Quiz",instruction:"Choose the correct English word.",start:"Start quiz",score:"Score",correct:"Wonderful! That's correct!",wrong:"Good try! Let's learn together.",next:"Next question",themes:["Weather & Seasons","Animals","Fruits & Vegetables","Colours & Shapes","Numbers & Counting","Alphabet & Phonics","Body Parts","Transport","Family","Home & Furniture","Food & Drinks","Clothes","Feelings","Daily Routines"],words:["Sun","Rain","Snow","Cloud","Wind","Spring","Summer","Autumn","Winter","Hot","Cold","Rainbow"],meanings:["The sun is shining.","It is raining.","Snow is falling.","A white cloud.","The wind is blowing.","Flowers grow in spring.","Summer is warm.","Leaves fall in autumn.","Winter is cold.","It is hot today.","It is cold today.","Look at the rainbow!"]},
+uz:{tag:"Toshbaqa Toto bilan ingliz tilini o‘rganing!",language:"Tilni tanlang:",home:"Bosh sahifa",learn:"O‘rganish",quiz:"Test",welcome:"Salom! Men Toto. Keling, ingliz tilini birga o‘rganamiz!",listen:"Totoni tinglash",choose:"Mavzuni tanlang",learnTitle:"Keling, o‘rganamiz!",back:"Mavzularga qaytish",quizTitle:"Toto testi",instruction:"To‘g‘ri inglizcha so‘zni tanlang.",start:"Testni boshlash",score:"Natija",correct:"Ajoyib! To‘g‘ri javob!",wrong:"Yaxshi urinish! Keling, birga o‘rganamiz.",next:"Keyingi savol",themes:["Ob-havo va fasllar","Hayvonlar","Meva va sabzavotlar","Ranglar va shakllar","Sonlar va sanash","Alifbo va tovushlar","Tana a'zolari","Transport","Oila","Uy va mebellar","Oziq-ovqat","Kiyimlar","His-tuyg‘ular","Kundalik ishlar"],words:["Quyosh","Yomg‘ir","Qor","Bulut","Shamol","Bahor","Yoz","Kuz","Qish","Issiq","Sovuq","Kamalak"],meanings:["Quyosh charaqlayapti.","Yomg‘ir yog‘moqda.","Qor yog‘moqda.","Oq bulut.","Shamol esmoqda.","Bahorda gullar ochiladi.","Yoz issiq bo‘ladi.","Kuzda barglar to‘kiladi.","Qish sovuq bo‘ladi.","Bugun havo issiq.","Bugun havo sovuq.","Kamalakka qarang!"]},
+ru:{tag:"Учите английский с черепашкой Тото!",language:"Выберите язык:",home:"Главная",learn:"Учиться",quiz:"Викторина",welcome:"Привет! Я Тото. Давай учить английский вместе!",listen:"Послушать Тото",choose:"Выберите тему",learnTitle:"Давайте учиться!",back:"Назад к темам",quizTitle:"Викторина Тото",instruction:"Выберите правильное английское слово.",start:"Начать викторину",score:"Счёт",correct:"Замечательно! Правильно!",wrong:"Хорошая попытка! Давай учиться вместе.",next:"Следующий вопрос",themes:["Погода и времена года","Животные","Фрукты и овощи","Цвета и формы","Числа и счёт","Алфавит и звуки","Части тела","Транспорт","Семья","Дом и мебель","Еда и напитки","Одежда","Чувства","Распорядок дня"],words:["Солнце","Дождь","Снег","Облако","Ветер","Весна","Лето","Осень","Зима","Жарко","Холодно","Радуга"],meanings:["Солнце светит.","Идёт дождь.","Идёт снег.","Белое облако.","Дует ветер.","Весной растут цветы.","Летом тепло.","Осенью падают листья.","Зимой холодно.","Сегодня жарко.","Сегодня холодно.","Посмотри на радугу!"]}
+};
+const themes=[
+["weather",["sun","rain","snow","cloud","wind","spring","summer","autumn","winter","hot","cold","rainbow"]],
+["animals",["cat","dog","bird","fish","rabbit","lion","elephant","monkey"]],
+["fruit",["apple","banana","orange","grapes","pear","carrot","tomato","potato"]],
+["colours",["red","blue","yellow","green","circle","square","star","triangle"]],
+["numbers",["one","two","three","four","five","six","seven","eight"]],
+["alphabet",["A","B","C","D","E","F","G","H"]],
+["body",["head","eyes","ears","nose","mouth","hands","feet","legs"]],
+["transport",["car","bus","train","airplane","bicycle","boat","truck","taxi"]],
+["family",["mother","father","sister","brother","baby","grandma","grandpa"]],
+["home",["house","door","window","chair","table","bed","lamp","sofa"]],
+["food",["bread","milk","water","cheese","egg","rice","juice","soup"]],
+["clothes",["shirt","dress","shoes","hat","socks","coat","trousers"]],
+["feelings",["happy","sad","angry","sleepy","excited","scared","kind"]],
+["routines",["wake up","brush teeth","eat breakfast","go to school","play","sleep"]]
+];
+const english={
+weather:["sun","rain","snow","cloud","wind","spring","summer","autumn","winter","hot","cold","rainbow"],
+animals:["cat","dog","bird","fish","rabbit","lion","elephant","monkey"],
+fruit:["apple","banana","orange","grapes","pear","carrot","tomato","potato"],
+colours:["red","blue","yellow","green","circle","square","star","triangle"],
+numbers:["one","two","three","four","five","six","seven","eight"],
+alphabet:["A","B","C","D","E","F","G","H"],
+body:["head","eyes","ears","nose","mouth","hands","feet","legs"],
+transport:["car","bus","train","airplane","bicycle","boat","truck","taxi"],
+family:["mother","father","sister","brother","baby","grandma","grandpa"],
+home:["house","door","window","chair","table","bed","lamp","sofa"],
+food:["bread","milk","water","cheese","egg","rice","juice","soup"],
+clothes:["shirt","dress","shoes","hat","socks","coat","trousers"],
+feelings:["happy","sad","angry","sleepy","excited","scared","kind"],
+routines:["wake up","brush teeth","eat breakfast","go to school","play","sleep"]
+};
+const uzWords={
+weather:["quyosh","yomg‘ir","qor","bulut","shamol","bahor","yoz","kuz","qish","issiq","sovuq","kamalak"],
+animals:["mushuk","it","qush","baliq","quyon","sher","fil","maymun"],
+fruit:["olma","banan","apelsin","uzum","nok","sabzi","pomidor","kartoshka"],
+colours:["qizil","ko‘k","sariq","yashil","doira","kvadrat","yulduz","uchburchak"],
+numbers:["bir","ikki","uch","to‘rt","besh","olti","yetti","sakkiz"],
+alphabet:["A","B","C","D","E","F","G","H"],
+body:["bosh","ko‘zlar","quloqlar","burun","og‘iz","qo‘llar","oyoqlar","oyoqlar"],
+transport:["mashina","avtobus","poyezd","samolyot","velosiped","qayiq","yuk mashinasi","taksi"],
+family:["ona","ota","opa/singil","aka/uka","chaqaloq","buvi","bobo"],
+home:["uy","eshik","deraza","stul","stol","karavot","chiroq","divan"],
+food:["non","sut","suv","pishloq","tuxum","guruch","sharbat","sho‘rva"],
+clothes:["ko‘ylak","ko‘ylak","oyoq kiyim","shapka","paypoq","palto","shim"],
+feelings:["xursand","xafa","jahli chiqqan","uyqusi kelgan","hayajonlangan","qo‘rqqan","mehribon"],
+routines:["uyg‘onmoq","tish yuvmoq","nonushta qilmoq","maktabga bormoq","o‘ynamoq","uxlamoq"]
+};
+const ruWords={
+weather:["солнце","дождь","снег","облако","ветер","весна","лето","осень","зима","жарко","холодно","радуга"],
+animals:["кошка","собака","птица","рыба","кролик","лев","слон","обезьяна"],
+fruit:["яблоко","банан","апельсин","виноград","груша","морковь","помидор","картофель"],
+colours:["красный","синий","жёлтый","зелёный","круг","квадрат","звезда","треугольник"],
+numbers:["один","два","три","четыре","пять","шесть","семь","восемь"],
+alphabet:["А","Б","В","Г","Д","Е","Ж","З"],
+body:["голова","глаза","уши","нос","рот","руки","ступни","ноги"],
+transport:["машина","автобус","поезд","самолёт","велосипед","лодка","грузовик","такси"],
+family:["мама","папа","сестра","брат","малыш","бабушка","дедушка"],
+home:["дом","дверь","окно","стул","стол","кровать","лампа","диван"],
+food:["хлеб","молоко","вода","сыр","яйцо","рис","сок","суп"],
+clothes:["рубашка","платье","обувь","шапка","носки","пальто","брюки"],
+feelings:["счастливый","грустный","сердитый","сонный","взволнованный","испуганный","добрый"],
+routines:["просыпаться","чистить зубы","завтракать","идти в школу","играть","спать"]
+};
+let lang="en",current="weather",questionIndex=0,points=0,quizItems=[];
+const $=id=>document.getElementById(id);
+function t(key){return translations[lang][key]}
+function changeLanguage(){
+lang=$("language").value;
+$("tagline").textContent=t("tag");$("languageLabel").textContent=t("language");
+$("homeBtn").textContent=t("home");$("learnBtn").textContent=t("learn");$("quizBtn").textContent=t("quiz");
+$("welcome").textContent=t("welcome");$("helloVoice").textContent=t("listen");
+$("chooseTitle").textContent=t("choose");$("learnTitle").textContent=t("learnTitle");
+$("backHome").textContent=t("back");$("quizTitle").textContent=t("quizTitle");
+$("quizInstruction").textContent=t("instruction");$("startQuiz").textContent=t("start");
+renderThemes();renderLesson();
+}
+function welcomeText(){return t("welcome")}
+function showPage(page){
+["home","learn","quiz"].forEach(p=>$(p).classList.toggle("hidden",p!==page));
+["homeBtn","learnBtn","quizBtn"].forEach((id,i)=>$(id).classList.toggle("active",["home","learn","quiz"][i]===page));
+if(page==="home")renderThemes();
+if(page==="learn")renderLesson();
+}
+function renderThemes(){
+$("homeThemes").innerHTML="";
+themes.forEach((theme,i)=>{
+let b=document.createElement("button");b.className="theme";
+b.textContent=t("themes")[i];b.onclick=()=>{current=theme[0];showPage("learn")};
+$("homeThemes").appendChild(b);
+});
+}
+function speak(word){
+if(!("speechSynthesis" in window)){alert("Voice is not supported in this browser.");return}
+speechSynthesis.cancel();
+let msg=new SpeechSynthesisUtterance(word);
+msg.lang="en-US";msg.rate=.82;speechSynthesis.speak(msg);
+}
+function renderLesson(){
+if(!$("lessonContent"))return;
+let words=english[current]||english.weather;
+let local=lang==="uz"?uzWords[current]:lang==="ru"?ruWords[current]:words;
+let html="";
+if(current==="weather"){
+html+=`<svg class="scene" viewBox="0 0 700 260">
+<rect width="700" height="260" fill="#c9efff"/>
+<circle cx="560" cy="65" r="40" fill="#ffda56"/>
+<path d="M0 205 Q170 155 350 210 T700 200 V260 H0" fill="#80ce82"/>
+<g fill="white"><ellipse cx="160" cy="65" rx="55" ry="22"/><ellipse cx="190" cy="50" rx="35" ry="28"/></g>
+<g transform="translate(250 65)">
+<ellipse cx="110" cy="130" rx="95" ry="65" fill="#e9a85d" stroke="#81562e" stroke-width="5"/>
+<path d="M40 125 Q110 35 180 125 Q170 190 55 190Z" fill="#64b77b" stroke="#397a52" stroke-width="5"/>
+<path d="M110 65V180 M50 120H170" stroke="#397a52" stroke-width="5"/>
+<ellipse cx="205" cy="105" rx="42" ry="45" fill="#8bd18d" stroke="#397a52" stroke-width="5"/>
+<circle cx="218" cy="92" r="6"/><path d="M210 120q15 12 27 0" fill="none" stroke="#397a52" stroke-width="4"/>
+</g></svg>`;
+}
+words.forEach((word,i)=>{
+html+=`<div class="word"><strong>${word}</strong><span>${local[i]||""}</span><p class="small">${current==="weather"?(translations[lang].meanings[i]||""): "Let's say it together!"}</p><button onclick="speak('${word.replace(/'/g,"")}')">🔊 Listen</button></div>`;
+});
+$("lessonContent").innerHTML=html;
+}
+function startQuiz(){
+let words=english[current]||english.weather;
+quizItems=[...words].sort(()=>Math.random()-.5);
+questionIndex=0;points=0;showQuestion();
+}
+function showQuestion(){
+let words=english[current]||english.weather;
+if(questionIndex>=quizItems.length){$("question").textContent=`Finished! ${points} / ${quizItems.length}`;$("answers").innerHTML="";$("feedback").textContent="You did a great job!";$("score").textContent=t("score")+": "+points;return}
+let answer=quizItems[questionIndex];
+let options=[answer,...words.filter(w=>w!==answer).sort(()=>Math.random()-.5).slice(0,3)].sort(()=>Math.random()-.5);
+$("question").textContent="What is this word?  "+(lang==="uz"?(uzWords[current][words.indexOf(answer)]||""):lang==="ru"?(ruWords[current][words.indexOf(answer)]||""):answer);
+if(lang!=="en")$("question").textContent=answer;
+$("answers").innerHTML="";
+options.forEach(option=>{
+let b=document.createElement("button");b.className="answer";b.textContent=option;
+b.onclick=()=>{
+if(b.disabled)return;
+document.querySelectorAll(".answer").forEach(x=>x.disabled=true);
+if(option===answer){points++;$("feedback").textContent=t("correct");speak(answer)}
+else{$("feedback").textContent=t("wrong")+" Correct answer: "+answer;speak(answer)}
+$("score").textContent=t("score")+": "+points;
+let next=document.createElement("button");next.className="action";next.textContent=t("next");next.onclick=()=>{questionIndex++;showQuestion()};$("answers").appendChild(next);
+};$("answers").appendChild(b);
+});
+$("feedback").textContent="";$("score").textContent=t("score")+": "+points;
+}
+renderThemes();changeLanguage();
+</script>
+</body>
+</html>
+
