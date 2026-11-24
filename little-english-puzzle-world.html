@@ -1,1 +1,254 @@
 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Little English Friends</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(#c9f1ff,#fff3d5);font-family:Arial,sans-serif;color:#315344;text-align:center}
+header{padding:14px 10px 5px}
+h1{margin:4px;font-size:27px;color:#24845b}
+.sub{font-size:15px;margin:5px}
+#toto{width:92px;height:92px;margin:4px auto}
+#toto svg{width:100%;height:100%}
+.controls{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;padding:8px}
+select,button{border:0;border-radius:18px;padding:11px 15px;font-size:15px;font-weight:bold;background:white;color:#286c50;box-shadow:0 3px 7px #7eaa8c55}
+button{background:#ffcf65;color:#68451b}
+button:active{transform:scale(.96)}
+#message{font-size:19px;font-weight:bold;min-height:30px;padding:5px}
+#game{width:min(100%,430px);height:740px;display:block;margin:auto;touch-action:none}
+#next{display:none;margin:5px auto 20px;background:#76d99b;color:#174d35;font-size:18px}
+#stars{font-size:20px;color:#e5a500;margin:4px}
+footer{font-size:12px;padding:10px;color:#668675}
+</style>
+</head>
+<body>
+<header>
+<h1>🌈 Little English Friends</h1>
+<div class="sub" id="welcome">Let's play and learn English!</div>
+<div id="toto">
+<svg viewBox="0 0 120 120" role="img" aria-label="Toto the turtle">
+<ellipse cx="60" cy="72" rx="37" ry="27" fill="#36ae70" stroke="#247d50" stroke-width="3"/>
+<path d="M30 69 Q60 26 90 69 Q88 99 60 99 Q32 99 30 69" fill="#a4dc70" stroke="#247d50" stroke-width="3"/>
+<path d="M60 48 L60 96 M35 69 Q60 83 85 69" fill="none" stroke="#4b9b57" stroke-width="3"/>
+<circle cx="60" cy="39" r="24" fill="#8cdb75" stroke="#247d50" stroke-width="3"/>
+<circle cx="51" cy="38" r="3.5" fill="#234d39"/><circle cx="69" cy="38" r="3.5" fill="#234d39"/>
+<path d="M53 49 Q60 55 67 49" fill="none" stroke="#234d39" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M38 20 L60 5 L82 20 Z" fill="#ffcf55" stroke="#bd8730" stroke-width="2"/>
+<path d="M38 20 L82 20 L82 25 L38 25 Z" fill="#e6a83d"/>
+<circle cx="31" cy="91" r="9" fill="#8cdb75"/><circle cx="89" cy="91" r="9" fill="#8cdb75"/>
+</svg>
+</div>
+<div class="controls">
+<select id="language" aria-label="Language">
+<option value="en">English</option>
+<option value="uz">O‘zbekcha</option>
+<option value="ru">Русский</option>
+</select>
+<select id="level" aria-label="Puzzle level">
+<option value="easy">Easy · 4 pieces</option>
+<option value="hard">Challenge · 9 pieces</option>
+</select>
+</div>
+</header>
+
+<div id="message">Choose a picture and make a puzzle!</div>
+<div id="stars">⭐ 0</div>
+<canvas id="game" width="390" height="740"></canvas>
+<button id="next">Next puzzle ➜</button>
+<footer>Play • Listen • Learn with Toto 🐢</footer>
+
+<script>
+const words=[
+ {word:"Cat",pic:"https://images.unsplash.com/photo-1573865526739-10659fec78a5?w=900"},
+ {word:"Dog",pic:"https://images.unsplash.com/photo-1552053831-71594a27632d?w=900"},
+ {word:"Butterfly",pic:"https://images.unsplash.com/photo-1531058020387-3be344556be6?w=900"},
+ {word:"Sun",pic:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=900"},
+ {word:"Fish",pic:"https://images.unsplash.com/photo-1535591273668-578e31182c4f?w=900"},
+ {word:"Snow",pic:"https://images.unsplash.com/photo-1517299321609-52687d1bc55a?w=900"},
+ {word:"Rainbow",pic:"https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=900"},
+ {word:"Apple",pic:"https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=900"}
+];
+const translations={
+ en:{welcome:"Let's play and learn English!",start:"Choose a picture and make a puzzle!",drag:"Drag a piece into the picture!",great:"Wonderful! This is",next:"Next puzzle ➜",done:"You did it!"},
+ uz:{welcome:"Keling, o‘ynab ingliz tilini o‘rganamiz!",start:"Rasm tanlang va pazlni yig‘ing!",drag:"Pazl bo‘lagini rasmga joylashtiring!",great:"Ajoyib! Bu",next:"Keyingi pazl ➜",done:"Barakalla!"},
+ ru:{welcome:"Давайте играть и учить английский!",start:"Выбери картинку и собери пазл!",drag:"Перетащи деталь на картинку!",great:"Замечательно! Это",next:"Следующий пазл ➜",done:"Ты справился!"}
+};
+const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
+const msg=document.getElementById("message");
+const nextBtn=document.getElementById("next");
+const lang=document.getElementById("language");
+const level=document.getElementById("level");
+let current=0,stars=0,img=null,pieces=[],selected=null,complete=false;
+let cols=2,rows=2,bx=45,by=105,bw=300,bh=210,tab=13;
+
+function say(text){
+ if(!("speechSynthesis" in window))return;
+ speechSynthesis.cancel();
+ const speech=new SpeechSynthesisUtterance(text);
+ speech.lang="en-US";
+ speech.rate=.82;
+ speech.pitch=1.12;
+ speechSynthesis.speak(speech);
+}
+function wordsText(key){return translations[lang.value][key]}
+function shuffle(a){
+ for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
+ return a;
+}
+function edgeH(c,x1,y,x2,dir,t){
+ const w=x2-x1;
+ c.lineTo(x1+w*.34,y);
+ c.bezierCurveTo(x1+w*.34,y+dir*t,x1+w*.66,y+dir*t,x1+w*.66,y);
+ c.lineTo(x2,y);
+}
+function edgeV(c,x,y1,y2,dir,t){
+ const h=y2-y1;
+ c.lineTo(x,y1+h*.34);
+ c.bezierCurveTo(x+dir*t,y1+h*.34,x+dir*t,y1+h*.66,x,y1+h*.66);
+ c.lineTo(x,y2);
+}
+function makePath(c,p){
+ const x=tab,y=tab,w=p.cw,h=p.ch;
+ c.beginPath();c.moveTo(x,y);
+ if(p.r===0)c.lineTo(x+w,y);
+ else edgeH(c,x,y,x+w,-p.top,tab);
+ if(p.c===cols-1)c.lineTo(x+w,y+h);
+ else edgeV(c,x+w,y,y+h,p.right,tab);
+ if(p.r===rows-1)c.lineTo(x,y+h);
+ else edgeH(c,x+w,y+h,x,p.bottom,tab);
+ if(p.c===0)c.lineTo(x,y);
+ else edgeV(c,x,y+h,y,-p.left,tab);
+ c.closePath();
+}
+function buildPuzzle(){
+ cols=level.value==="easy"?2:3;
+ rows=cols;
+ bw=300;bh=210;bx=45;by=105;
+ const cw=bw/cols,ch=bh/rows;
+ const H=[],V=[];
+ for(let r=0;r<=rows;r++){H[r]=[];for(let c=0;c<cols;c++)H[r][c]=r===0||r===rows?0:(Math.random()<.5?1:-1)}
+ for(let r=0;r<rows;r++){V[r]=[];for(let c=0;c<=cols;c++)V[r][c]=c===0||c===cols?0:(Math.random()<.5?1:-1)}
+ pieces=[];
+ for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+  const p={r,c,cw,ch,top:H[r][c],bottom:H[r+1][c],left:V[r][c],right:V[r][c+1],placed:false};
+  const pc=document.createElement("canvas");
+  pc.width=Math.ceil(cw+2*tab);pc.height=Math.ceil(ch+2*tab);
+  const q=pc.getContext("2d");
+  q.save();makePath(q,p);q.clip();
+  q.drawImage(img,tab-c*cw,tab-r*ch,bw,bh);
+  q.restore();
+  p.canvas=pc;
+  p.targetX=bx+c*cw-tab;p.targetY=by+r*ch-tab;
+  pieces.push(p);
+ }
+ shuffle(pieces);
+ const trayY=cols===2?390:365;
+ const slotW=cols===2?180:126;
+ const slotH=cols===2?145:112;
+ pieces.forEach((p,i)=>{
+  p.x=cols===2?10+(i%2)*190:5+(i%3)*128;
+  p.y=trayY+Math.floor(i/cols)*slotH;
+  p.startX=p.x;p.startY=p.y;
+ });
+ complete=false;selected=null;
+ nextBtn.style.display="none";
+ msg.textContent=wordsText("drag");
+ draw();
+}
+function draw(){
+ ctx.clearRect(0,0,390,740);
+ ctx.fillStyle="#fffdf5";ctx.fillRect(12,85,366,260);
+ ctx.fillStyle="#e5f5dc";ctx.fillRect(bx,by,bw,bh);
+ if(img){
+  ctx.globalAlpha=.20;ctx.drawImage(img,bx,by,bw,bh);ctx.globalAlpha=1;
+ }
+ ctx.strokeStyle="#83b98b";ctx.lineWidth=3;ctx.strokeRect(bx,by,bw,bh);
+ ctx.fillStyle="#4c9870";ctx.font="bold 15px Arial";ctx.textAlign="center";
+ ctx.fillText("PUZZLE",195,92);
+ ctx.fillStyle="#fff9e8";ctx.fillRect(12,355,366,360);
+ ctx.fillStyle="#8aa58d";ctx.font="bold 14px Arial";ctx.fillText("PUZZLE PIECES",195,375);
+ pieces.forEach(p=>{
+  if(p.placed)return;
+  ctx.save();
+  ctx.shadowColor="#638b6b55";ctx.shadowBlur=5;ctx.shadowOffsetY=3;
+  ctx.drawImage(p.canvas,p.x,p.y);
+  ctx.restore();
+ });
+}
+function pointerPos(e){
+ const r=canvas.getBoundingClientRect();
+ return {x:(e.clientX-r.left)*390/r.width,y:(e.clientY-r.top)*740/r.height};
+}
+canvas.addEventListener("pointerdown",e=>{
+ if(complete)return;
+ const pos=pointerPos(e);
+ for(let i=pieces.length-1;i>=0;i--){
+  const p=pieces[i];
+  if(!p.placed&&pos.x>=p.x&&pos.x<=p.x+p.canvas.width&&pos.y>=p.y&&pos.y<=p.y+p.canvas.height){
+   selected=p;selected.offsetX=pos.x-p.x;selected.offsetY=pos.y-p.y;
+   canvas.setPointerCapture(e.pointerId);
+   pieces.splice(i,1);pieces.push(selected);
+   draw();break;
+  }
+ }
+});
+canvas.addEventListener("pointermove",e=>{
+ if(!selected)return;
+ const pos=pointerPos(e);
+ selected.x=pos.x-selected.offsetX;
+ selected.y=pos.y-selected.offsetY;
+ draw();
+});
+canvas.addEventListener("pointerup",()=>{
+ if(!selected)return;
+ const p=selected;
+ const cx=p.x+p.canvas.width/2,cy=p.y+p.canvas.height/2;
+ const tx=p.targetX+p.canvas.width/2,ty=p.targetY+p.canvas.height/2;
+ if(Math.hypot(cx-tx,cy-ty)<65){
+  p.x=p.targetX;p.y=p.targetY;p.placed=true;
+  say("Good job!");
+ }else{
+  p.x=p.startX;p.y=p.startY;
+ }
+ selected=null;
+ draw();
+ if(pieces.every(x=>x.placed))finish();
+});
+function finish(){
+ complete=true;stars++;
+ document.getElementById("stars").textContent="⭐ "+stars;
+ msg.textContent=wordsText("great")+" "+words[current].word+"!";
+ say("Wonderful! This is "+words[current].word+". "+words[current].word+"!");
+ nextBtn.textContent=wordsText("next");
+ nextBtn.style.display="block";
+}
+function loadPuzzle(){
+ msg.textContent="Loading picture…";
+ nextBtn.style.display="none";
+ img=new Image();img.crossOrigin="anonymous";
+ img.onload=()=>buildPuzzle();
+ img.onerror=()=>{
+  msg.textContent="This picture could not load. Please try again.";
+ };
+ img.src=words[current].pic;
+}
+lang.addEventListener("change",()=>{
+ document.getElementById("welcome").textContent=wordsText("welcome");
+ if(!complete)msg.textContent=wordsText("drag");
+ nextBtn.textContent=wordsText("next");
+});
+level.addEventListener("change",loadPuzzle);
+nextBtn.addEventListener("click",()=>{
+ current=(current+1)%words.length;
+ loadPuzzle();
+});
+document.getElementById("welcome").textContent=wordsText("welcome");
+loadPuzzle();
+</script>
+</body>
+</html>
