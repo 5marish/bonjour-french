@@ -1,1 +1,328 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Toto's Little Puzzle Garden</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;text-align:center;font-family:Arial,sans-serif;color:#315746;background:linear-gradient(#bcebdc,#fff2d7);min-height:100vh}
+header{padding:15px 10px}
+h1{color:#27865c;font-size:27px;margin:5px}
+p{margin:7px}
+select,button{border:0;border-radius:18px;padding:12px 15px;font-size:15px;font-weight:bold;background:white;color:#315746;box-shadow:0 3px 0 #a6cfb5;margin:4px}
+button{background:#ffd875;cursor:pointer}
+#toto{width:100px;height:100px;margin:auto}
+#teacher{max-width:420px;margin:8px auto;background:#fffdf2;border:2px solid #d4ebc8;border-radius:20px;padding:12px;font-weight:bold;font-size:18px}
+#stars{color:#bd8a1b;font-size:20px;font-weight:bold}
+#game{width:min(96vw,420px);height:auto;background:#fff;border:5px solid white;border-radius:22px;touch-action:none;box-shadow:0 5px 15px #477a5c33}
+#next{display:none;background:#83d9a2}
+#matching{display:none;max-width:420px;margin:12px auto;background:#fffdf5;padding:12px;border-radius:22px}
+#choices{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.choice{padding:5px;background:#f0f9e9;box-shadow:none;border:3px solid #d5edcf;min-height:110px}
+.choice svg{width:100%;height:80px}
+.choice span{display:block;font-size:13px}
+#feedback{min-height:28px;font-weight:bold;font-size:18px}
+footer{padding:15px;font-size:13px}
+</style>
+</head>
+<body>
+<header>
+<h1>🌈 Toto's Little Puzzle Garden</h1>
+<p id="subtitle">Play a puzzle and learn English!</p>
+
+<svg id="toto" viewBox="0 0 120 120">
+<ellipse cx="60" cy="77" rx="39" ry="27" fill="#369e68" stroke="#286d4d" stroke-width="3"/>
+<path d="M29 77Q60 42 90 77Q89 104 60 105Q31 104 29 77" fill="#8bcf70" stroke="#286d4d" stroke-width="3"/>
+<path d="M60 58V101M35 75Q60 91 85 75" fill="none" stroke="#4c9c58" stroke-width="3"/>
+<circle cx="60" cy="42" r="24" fill="#9cde7c" stroke="#286d4d" stroke-width="3"/>
+<circle cx="51" cy="42" r="3.5" fill="#244d3a"/><circle cx="69" cy="42" r="3.5" fill="#244d3a"/>
+<path d="M51 53Q60 61 69 52" fill="none" stroke="#244d3a" stroke-width="2.5"/>
+<path d="M35 23L60 5L85 23Z" fill="#ffd36a" stroke="#b78338" stroke-width="2"/>
+<path d="M35 23H85V29H35Z" fill="#e7a94a"/>
+<circle cx="29" cy="94" r="9" fill="#9cde7c"/><circle cx="91" cy="94" r="9" fill="#9cde7c"/>
+</svg>
+
+<select id="language">
+<option value="en">English</option>
+<option value="uz">O‘zbekcha</option>
+<option value="ru">Русский</option>
+</select>
+
+<select id="level">
+<option value="easy">Easy · 4 pieces</option>
+<option value="hard">Challenge · 9 pieces</option>
+</select>
+</header>
+
+<div id="teacher">Hello, friend! Let's make a puzzle. 🐢</div>
+<div id="stars">⭐ Stars: 0</div>
+
+<canvas id="game" width="390" height="520"></canvas>
+
+<div>
+<button id="hear">🔊 Hear Toto</button>
+<button id="next">Next puzzle ➜</button>
+</div>
+
+<section id="matching">
+<h2 id="matchTitle">Listen. Find the picture!</h2>
+<div id="choices"></div>
+<div id="feedback"></div>
+</section>
+
+<footer>Little steps, big smiles! 💚</footer>
+
+<script>
+const pictures=[
+ {word:"SUN",art:"sun"},
+ {word:"CAT",art:"cat"},
+ {word:"SNOW",art:"snow"},
+ {word:"DOG",art:"dog"},
+ {word:"APPLE",art:"apple"},
+ {word:"FISH",art:"fish"},
+ {word:"RAINBOW",art:"rainbow"},
+ {word:"BUTTERFLY",art:"butterfly"}
+];
+
+const translations={
+en:{
+subtitle:"Play a puzzle and learn English!",
+hello:"Hello, friend! Let's make a puzzle.",
+drag:"Drag the puzzle pieces into their places!",
+win:"Wonderful! This is",
+find:"Listen. Find the picture!",
+yes:"Yes! Wonderful!",
+try:"Good try! Listen again.",
+next:"Next puzzle ➜",
+hear:"🔊 Hear Toto",
+stars:"Stars",
+done:"Great job! Now find the picture!"
+},
+uz:{
+subtitle:"Pazl o‘yna va ingliz tilini o‘rgan!",
+hello:"Salom, do‘stim! Pazl yig‘amiz.",
+drag:"Pazl bo‘laklarini joyiga qo‘y!",
+win:"Ajoyib! Bu",
+find:"Eshit. Rasmni top!",
+yes:"Ha! Ajoyib!",
+try:"Yana urinib ko‘r!",
+next:"Keyingi pazl ➜",
+hear:"🔊 Toto'ni tingla",
+stars:"Yulduzlar",
+done:"Barakalla! Endi rasmni top!"
+},
+ru:{
+subtitle:"Собирай пазлы и учи английский!",
+hello:"Привет, друг! Давай соберём пазл.",
+drag:"Поставь детали пазла на свои места!",
+win:"Замечательно! Это",
+find:"Слушай. Найди картинку!",
+yes:"Да! Молодец!",
+try:"Попробуй ещё!",
+next:"Следующий пазл ➜",
+hear:"🔊 Слушать Тото",
+stars:"Звёзды",
+done:"Молодец! Теперь найди картинку!"
+}
+};
+
+const names={
+SUN:["SUN","QUYOSH","СОЛНЦЕ"],
+CAT:["CAT","MUSHUK","КОШКА"],
+SNOW:["SNOW","QOR","СНЕГ"],
+DOG:["DOG","IT","СОБАКА"],
+APPLE:["APPLE","OLMA","ЯБЛОКО"],
+FISH:["FISH","BALIQ","РЫБА"],
+RAINBOW:["RAINBOW","KAMALAK","РАДУГА"],
+BUTTERFLY:["BUTTERFLY","KAPALAK","БАБОЧКА"]
+};
+
+let language="en",index=0,stars=0;
+let pieces=[],dragging=null,finished=false;
+let columns=2,rows=2;
+const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
+
+function t(key){return translations[language][key]}
+
+function say(word){
+ if(!window.speechSynthesis)return;
+ speechSynthesis.cancel();
+ let voice=new SpeechSynthesisUtterance(word);
+ voice.lang="en-US";
+ voice.rate=.8;
+ voice.pitch=1.12;
+ speechSynthesis.speak(voice);
+}
+
+function picture(kind){
+ const art={
+sun:`<rect width="360" height="250" fill="#bde9ff"/><circle cx="180" cy="110" r="55" fill="#ffd447"/><g stroke="#f2aa30" stroke-width="8"><path d="M180 25V5M180 215v-20M90 110H65M295 110h-25M117 48l-16-16M243 48l16-16"/></g><path d="M0 200Q90 165 180 200T360 195V250H0Z" fill="#80c879"/>`,
+cat:`<rect width="360" height="250" fill="#ffe1c7"/><path d="M0 200Q100 175 180 200T360 195V250H0Z" fill="#a7d58b"/><path d="M105 90L115 30L160 68Q180 55 200 68L245 30L255 90Q275 160 180 200Q85 160 105 90Z" fill="#efa46d" stroke="#a96543" stroke-width="5"/><path d="M120 60L145 80L130 92ZM240 60L215 80L230 92Z" fill="#f5b3aa"/><circle cx="150" cy="120" r="7" fill="#315746"/><circle cx="210" cy="120" r="7" fill="#315746"/><path d="M171 145Q180 157 189 145" fill="none" stroke="#794b3a" stroke-width="4"/>`,
+snow:`<rect width="360" height="250" fill="#c3e9ff"/><path d="M0 185L90 70L170 185L250 60L360 185V250H0Z" fill="#91bdd7"/><path d="M90 70L58 115L90 102L118 120ZM250 60L220 110L250 98L278 118Z" fill="white"/><path d="M0 195Q100 165 180 195T360 190V250H0Z" fill="white"/><g stroke="white" stroke-width="5"><path d="M60 25V55M45 40H75M200 15V45M185 30H215M305 110V140M290 125H320"/></g>`,
+dog:`<rect width="360" height="250" fill="#d9edc7"/><path d="M0 205Q100 175 190 205T360 200V250H0Z" fill="#8fc878"/><path d="M110 85Q65 25 55 95Q50 155 110 170ZM250 85Q295 25 305 95Q310 155 250 170Z" fill="#9b6947" stroke="#704c37" stroke-width="4"/><ellipse cx="180" cy="130" rx="80" ry="82" fill="#d5a16e" stroke="#94633e" stroke-width="5"/><circle cx="150" cy="120" r="7" fill="#2d493b"/><circle cx="210" cy="120" r="7" fill="#2d493b"/><ellipse cx="180" cy="151" rx="22" ry="16" fill="#f5d4ad"/><ellipse cx="180" cy="145" rx="9" ry="7" fill="#493d38"/>`,
+apple:`<rect width="360" height="250" fill="#fce0d5"/><path d="M0 205Q100 180 180 205T360 200V250H0Z" fill="#b5d995"/><path d="M180 70Q140 40 115 75Q80 115 115 170Q145 220 180 190Q215 220 245 170Q280 115 245 75Q220 40 180 70Z" fill="#e95750" stroke="#b63d3a" stroke-width="5"/><path d="M180 70Q180 40 195 30" stroke="#76513b" stroke-width="8" fill="none"/><path d="M190 48Q225 15 246 48Q220 70 190 48Z" fill="#65ad65"/>`,
+fish:`<rect width="360" height="250" fill="#b9e9ed"/><path d="M0 205Q90 185 180 205T360 200V250H0Z" fill="#72c4c7"/><path d="M80 125Q150 45 250 125Q150 205 80 125Z" fill="#f6a64f" stroke="#bf713b" stroke-width="5"/><path d="M85 125L35 75L35 175Z" fill="#f7c05c" stroke="#bf713b" stroke-width="5"/><circle cx="220" cy="112" r="8" fill="#263f42"/><circle cx="222" cy="110" r="3" fill="white"/>`,
+rainbow:`<rect width="360" height="250" fill="#cde8ff"/><path d="M45 210A135 135 0 0 1 315 210" fill="none" stroke="#ef7772" stroke-width="25"/><path d="M72 210A108 108 0 0 1 288 210" fill="none" stroke="#f8bd5d" stroke-width="23"/><path d="M96 210A84 84 0 0 1 264 210" fill="none" stroke="#f6df75" stroke-width="22"/><path d="M120 210A60 60 0 0 1 240 210" fill="none" stroke="#83c98b" stroke-width="21"/><path d="M0 210Q80 185 180 210T360 210V250H0Z" fill="#9bd18c"/>`,
+butterfly:`<rect width="360" height="250" fill="#f8dff0"/><path d="M0 205Q100 180 180 205T360 200V250H0Z" fill="#a7d68c"/><path d="M175 120Q100 25 75 95Q55 160 170 160Q110 210 155 215Q180 210 180 160Q180 210 205 215Q250 210 190 160Q305 160 285 95Q255 25 185 120Z" fill="#f28fc0" stroke="#a94f8a" stroke-width="5"/><ellipse cx="180" cy="150" rx="9" ry="43" fill="#594b60"/><path d="M177 110Q153 75 143 83M183 110Q207 75 217 83" stroke="#594b60" stroke-width="4" fill="none"/>`
+ };
+ return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 250">${art[kind]}</svg>`;
+}
+function imageData(kind){return "data:image/svg+xml;charset=utf-8,"+encodeURIComponent(picture(kind))}
+
+function makePath(w,h,top,right,bottom,left){
+ let d="M0 0";
+ const b=17;
+ if(!top)d+=` L${w} 0`;else d+=` L${w*.34} 0 C${w*.34} ${-top*b} ${w*.66} ${-top*b} ${w*.66} 0 L${w} 0`;
+ if(!right)d+=` L${w} ${h}`;else d+=` L${w} ${h*.34} C${w+right*b} ${h*.34} ${w+right*b} ${h*.66} ${w} ${h*.66} L${w} ${h}`;
+ if(!bottom)d+=` L0 ${h}`;else d+=` L${w*.66} ${h} C${w*.66} ${h+bottom*b} ${w*.34} ${h+bottom*b} ${w*.34} ${h} L0 ${h}`;
+ if(!left)d+=" L0 0";else d+=` L0 ${h*.66} C${-left*b} ${h*.66} ${-left*b} ${h*.34} 0 ${h*.34} L0 0`;
+ return d+" Z";
+}
+
+function draw(){
+ ctx.clearRect(0,0,390,520);
+ ctx.fillStyle="#f1f9e9";ctx.fillRect(20,25,350,240);
+ ctx.strokeStyle="#a8d3a4";ctx.lineWidth=3;ctx.strokeRect(40,45,310,200);
+ ctx.fillStyle="#4a8a61";ctx.font="bold 14px Arial";ctx.textAlign="center";
+ ctx.fillText("MAKE THE PUZZLE",195,18);
+ ctx.fillStyle="#fff8e8";ctx.fillRect(20,285,350,220);
+ ctx.fillText("PUZZLE PIECES",195,300);
+ pieces.forEach(p=>{
+  if(p.placed)return;
+  ctx.drawImage(p.canvas,p.x,p.y);
+ });
+}
+
+function buildPuzzle(){
+ columns=rows=document.getElementById("level").value==="easy"?2:3;
+ let w=310/columns,h=200/rows,tab=17;
+ pieces=[];
+ let source=new Image();
+ source.onload=()=>{
+  let horizontal=Array.from({length:rows+1},()=>Array.from({length:columns},()=>Math.random()<.5?1:-1));
+  let vertical=Array.from({length:rows},()=>Array.from({length:columns+1},()=>Math.random()<.5?1:-1));
+  for(let r=0;r<rows;r++)for(let c=0;c<columns;c++){
+   let p={r,c,w,h,top:r?-horizontal[r][c]:0,bottom:r<rows-1?horizontal[r+1][c]:0,left:c?-vertical[r][c]:0,right:c<columns-1?vertical[r][c+1]:0};
+   let pc=document.createElement("canvas");pc.width=w+2*tab;pc.height=h+2*tab;
+   let q=pc.getContext("2d");
+   q.save();q.translate(tab,tab);
+   q.beginPath();q.fill(new Path2D(makePath(w,h,p.top,p.right,p.bottom,p.left)));q.clip();
+   q.drawImage(source,-c*w,-r*h,310,200);q.restore();
+   q.save();q.translate(tab,tab);q.beginPath();q.strokeStyle="white";q.lineWidth=3;q.stroke(new Path2D(makePath(w,h,p.top,p.right,p.bottom,p.left)));q.restore();
+   p.canvas=pc;p.tx=40+c*w-tab;p.ty=45+r*h-tab;p.placed=false;
+   pieces.push(p);
+  }
+  pieces.sort(()=>Math.random()-.5);
+  pieces.forEach((p,i)=>{
+   p.x=columns===2?20+(i%2)*185:10+(i%3)*125;
+   p.y=columns===2?320+Math.floor(i/2)*95:315+Math.floor(i/3)*65;
+   p.homeX=p.x;p.homeY=p.y;
+  });
+  finished=false;
+  document.getElementById("next").style.display="none";
+  document.getElementById("matching").style.display="none";
+  document.getElementById("teacher").textContent=t("drag");
+  draw();
+ };
+ source.src=imageData(pictures[index].art);
+}
+
+function pointer(e){
+ let r=canvas.getBoundingClientRect();
+ return{x:(e.clientX-r.left)*390/r.width,y:(e.clientY-r.top)*520/r.height};
+}
+canvas.addEventListener("pointerdown",e=>{
+ if(finished)return;
+ let a=pointer(e);
+ for(let i=pieces.length-1;i>=0;i--){
+  let p=pieces[i];
+  if(!p.placed&&a.x>=p.x&&a.x<=p.x+p.canvas.width&&a.y>=p.y&&a.y<=p.y+p.canvas.height){
+   dragging=p;dragging.dx=a.x-p.x;dragging.dy=a.y-p.y;
+   pieces.splice(i,1);pieces.push(p);
+   canvas.setPointerCapture(e.pointerId);draw();break;
+  }
+ }
+});
+canvas.addEventListener("pointermove",e=>{
+ if(!dragging)return;
+ let a=pointer(e);
+ dragging.x=a.x-dragging.dx;dragging.y=a.y-dragging.dy;draw();
+});
+canvas.addEventListener("pointerup",()=>{
+ if(!dragging)return;
+ let p=dragging;
+ if(Math.hypot(p.x-p.tx,p.y-p.ty)<42){
+  p.x=p.tx;p.y=p.ty;p.placed=true;say("Good job!");
+ }else{p.x=p.homeX;p.y=p.homeY}
+ dragging=null;draw();
+ if(pieces.every(x=>x.placed))puzzleFinished();
+});
+
+function puzzleFinished(){
+ finished=true;
+ let word=pictures[index].word;
+ document.getElementById("teacher").textContent=t("win")+" "+word+"! 🎉";
+ say("Wonderful! This is "+word+". "+word+"!");
+ document.getElementById("matching").style.display="block";
+ document.getElementById("matchTitle").textContent=t("find");
+ document.getElementById("feedback").textContent=t("done");
+ makeChoices();
+}
+
+function makeChoices(){
+ let box=document.getElementById("choices");box.innerHTML="";
+ let options=[index];
+ while(options.length<3){
+  let n=Math.floor(Math.random()*pictures.length);
+  if(!options.includes(n))options.push(n);
+ }
+ options.sort(()=>Math.random()-.5);
+ options.forEach(n=>{
+  let b=document.createElement("button");b.className="choice";
+  let im=document.createElement("img");
+  im.src=imageData(pictures[n].art);im.alt="";
+  im.style.width="100%";im.style.height="80px";im.style.objectFit="contain";
+  let label=document.createElement("span");
+  label.textContent=names[pictures[n].word][["en","uz","ru"].indexOf(language)];
+  b.append(im,label);
+  b.onclick=()=>{
+   if(n===index){
+    stars++;
+    document.getElementById("stars").textContent="⭐ "+t("stars")+": "+stars;
+    document.getElementById("feedback").textContent=t("yes")+" "+pictures[index].word+"!";
+    say("Yes! "+pictures[index].word+"! Wonderful!");
+    document.getElementById("next").style.display="inline-block";
+   }else{
+    document.getElementById("feedback").textContent=t("try");
+    say("Try again. Find "+pictures[index].word+".");
+   }
+  };
+  box.append(b);
+ });
+}
+
+function updateLanguage(){
+ document.getElementById("subtitle").textContent=t("subtitle");
+ document.getElementById("hear").textContent=t("hear");
+ document.getElementById("next").textContent=t("next");
+ document.getElementById("stars").textContent="⭐ "+t("stars")+": "+stars;
+ if(!finished)document.getElementById("teacher").textContent=t("hello");
+}
+document.getElementById("language").onchange=e=>{
+ language=e.target.value;updateLanguage();
+ if(finished){document.getElementById("matchTitle").textContent=t("find");makeChoices();}
+};
+document.getElementById("level").onchange=buildPuzzle;
+document.getElementById("hear").onclick=()=>say("This is "+pictures[index].word+". "+pictures[index].word+".");
+document.getElementById("next").onclick=()=>{
+ index=(index+1)%pictures.length;buildPuzzle();
+};
+updateLanguage();
+buildPuzzle();
+</script>
+</body>
+</html>
+
